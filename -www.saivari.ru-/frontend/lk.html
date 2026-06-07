@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Личный кабинет — Saivari</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/lk.css">
+</head>
+<body>
+
+<!-- Шапка сайта -->
+<div class="topbar">
+  <div class="container--wide topbar__inner">
+    <span class="topbar__text">Компьютерный мастер в Воронеже · Выезд на дом и в офис</span>
+    <div class="topbar__socials">
+      <a href="https://vk.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="ВКонтакте">ВКонтакте</a>
+      <a href="mailto:info@saivari.ru" class="social-link" aria-label="Gmail">info@saivari.ru</a>
+    </div>
+  </div>
+</div>
+
+<header class="header" role="banner">
+  <div class="container--wide">
+    <div class="header__inner">
+      <a href="/" class="logo" aria-label="Saivari — на главную">
+        <img src="./assets/images/logo.jpg" alt="" width="42" height="42" loading="eager">
+        <span>Sai<span>vari</span></span>
+      </a>
+      <nav class="nav" role="navigation" aria-label="Главная навигация">
+        <ul class="nav__links" role="list">
+          <li><a href="/#services">Услуги</a></li>
+          <li><a href="/#how">Как работаем</a></li>
+          <li><a href="/#reviews">Отзывы</a></li>
+          <li><a href="/#contact">Контакты</a></li>
+        </ul>
+        <a href="/lk.html" class="btn btn--primary" aria-current="page">Личный кабинет</a>
+        <button class="theme-toggle" data-theme-toggle aria-label="Переключить тему"></button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- Auth Modal (показывается если не авторизован) -->
+<div class="auth-overlay" id="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title" style="display:none">
+  <div class="auth-modal">
+    <h2 class="auth-modal-title" id="auth-title">Войдите в аккаунт</h2>
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab active" id="tab-login" role="tab" aria-selected="true" onclick="switchTab('login')">Вход</button>
+      <button class="auth-tab" id="tab-register" role="tab" aria-selected="false" onclick="switchTab('register')">Регистрация</button>
+    </div>
+
+    <!-- Форма входа -->
+    <form class="auth-form" id="login-form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="login-email">Email</label>
+        <input class="form-input" id="login-email" type="email" placeholder="your@email.ru" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="login-password">Пароль</label>
+        <input class="form-input" id="login-password" type="password" placeholder="••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center">Войти</button>
+      <p class="auth-hint">Нет аккаунта? <a onclick="switchTab('register')">Зарегистрируйтесь</a></p>
+    </form>
+
+    <!-- Форма регистрации -->
+    <form class="auth-form" id="register-form" novalidate style="display:none">
+      <div class="form-group">
+        <label class="form-label" for="reg-name">Ваше имя</label>
+        <input class="form-input" id="reg-name" type="text" placeholder="Иван Иванов" required autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reg-email">Email</label>
+        <input class="form-input" id="reg-email" type="email" placeholder="your@email.ru" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reg-phone">Телефон (необязательно)</label>
+        <input class="form-input" id="reg-phone" type="tel" placeholder="+7 (900) 000-00-00" autocomplete="tel">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reg-password">Пароль</label>
+        <input class="form-input" id="reg-password" type="password" placeholder="Минимум 6 символов" required autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center">Создать аккаунт</button>
+      <p class="auth-hint">Уже есть аккаунт? <a onclick="switchTab('login')">Войдите</a></p>
+    </form>
+
+    <div id="auth-error" style="display:none;margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:#fce4ec;color:#c62828;border-radius:var(--radius-md);font-size:var(--text-sm)"></div>
+  </div>
+</div>
+
+<!-- Основной контент ЛК -->
+<main class="lk-page" id="lk-page" style="display:none">
+  <div class="lk-container">
+    <!-- Сайдбар -->
+    <aside class="lk-sidebar">
+      <div class="lk-user-info">
+        <div class="lk-avatar" id="lk-avatar">?</div>
+        <div class="lk-user-name" id="lk-username">Загрузка...</div>
+        <div class="lk-user-email" id="lk-email"></div>
+        <span class="lk-user-role">Клиент</span>
+      </div>
+      <nav>
+        <ul class="lk-nav" role="list">
+          <li class="lk-nav-item">
+            <button class="active" onclick="showPanel('overview')" aria-current="page">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              Обзор
+            </button>
+          </li>
+          <li class="lk-nav-item">
+            <button onclick="showPanel('orders')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Мои заявки
+            </button>
+          </li>
+          <li class="lk-nav-item">
+            <button onclick="showPanel('reviews')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Мои отзывы
+            </button>
+          </li>
+          <li class="lk-nav-item">
+            <button onclick="showPanel('new-order')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Новая заявка
+            </button>
+          </li>
+          <li class="lk-nav-item">
+            <button onclick="showPanel('new-review')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Оставить отзыв
+            </button>
+          </li>
+        </ul>
+      </nav>
+      <button class="lk-logout-btn" onclick="logout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Выйти
+      </button>
+    </aside>
+
+    <!-- Панели контента -->
+    <div class="lk-content">
+
+      <!-- Обзор -->
+      <section class="lk-panel active" id="panel-overview" aria-label="Обзор">
+        <h2 class="lk-panel-title">Добро пожаловать, <span id="overview-name">...</span>!</h2>
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <div class="admin-stat-num" id="stat-orders-total">—</div>
+            <div class="admin-stat-label">Заявок всего</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-num" id="stat-orders-active">—</div>
+            <div class="admin-stat-label">В работе</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-num" id="stat-reviews-total">—</div>
+            <div class="admin-stat-label">Отзывов</div>
+          </div>
+        </div>
+        <p style="font-size:var(--text-sm);color:var(--color-text-muted);line-height:1.7;">
+          В личном кабинете вы можете отслеживать статус своих заявок, общаться с мастером, 
+          а также оставлять отзывы о нашей работе.
+        </p>
+      </section>
+
+      <!-- Мои заявки -->
+      <section class="lk-panel" id="panel-orders" aria-label="Мои заявки">
+        <h2 class="lk-panel-title">Мои заявки</h2>
+        <div id="orders-list">
+          <div style="text-align:center;padding:var(--space-12);color:var(--color-text-faint)">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto var(--space-3)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <p style="margin-top:var(--space-2)">Заявок пока нет</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Чат по заявке -->
+      <section class="lk-panel" id="panel-chat" aria-label="Чат">
+        <div class="chat-header">
+          <button class="chat-back-btn" onclick="showPanel('orders')">← Назад</button>
+          <h2 class="chat-title" id="chat-title">Чат по заявке</h2>
+        </div>
+        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite"></div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" type="text" placeholder="Напишите сообщение..." maxlength="500">
+          <button class="chat-send-btn" onclick="sendMessage()">Отправить</button>
+        </div>
+      </section>
+
+      <!-- Мои отзывы -->
+      <section class="lk-panel" id="panel-reviews" aria-label="Мои отзывы">
+        <h2 class="lk-panel-title">Мои отзывы</h2>
+        <div id="reviews-list">
+          <div style="text-align:center;padding:var(--space-12);color:var(--color-text-faint)">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto var(--space-3)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <p style="margin-top:var(--space-2)">Отзывов пока нет</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Новая заявка -->
+      <section class="lk-panel" id="panel-new-order" aria-label="Новая заявка">
+        <h2 class="lk-panel-title">Оставить заявку</h2>
+        <form id="lk-order-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="lk-order-name">Ваше имя</label>
+            <input class="form-input" id="lk-order-name" type="text" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lk-order-contact">Телефон или Email</label>
+            <input class="form-input" id="lk-order-contact" type="text" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lk-order-service">Услуга</label>
+            <select class="form-select form-input" id="lk-order-service">
+              <option value="">— Выберите услугу —</option>
+              <option>Диагностика компьютера</option>
+              <option>Настройка ПО и Windows</option>
+              <option>Настройка интернета и Wi-Fi</option>
+              <option>Переустановка Windows / Linux</option>
+              <option>Настройка роутера</option>
+              <option>Другое</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lk-order-message">Описание проблемы</label>
+            <textarea class="form-textarea form-input" id="lk-order-message" rows="4" placeholder="Опишите вашу проблему подробнее..."></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center">Отправить заявку</button>
+        </form>
+      </section>
+
+      <!-- Новый отзыв -->
+      <section class="lk-panel" id="panel-new-review" aria-label="Оставить отзыв">
+        <h2 class="lk-panel-title">Оставить отзыв</h2>
+        <form id="lk-review-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="lk-review-name">Ваше имя</label>
+            <input class="form-input" id="lk-review-name" type="text" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Оценка</label>
+            <div class="star-rating" id="lk-star-rating" role="radiogroup" aria-label="Выберите оценку">
+              <span class="star" data-value="1" role="radio" aria-checked="false" tabindex="0" aria-label="1 звезда">★</span>
+              <span class="star" data-value="2" role="radio" aria-checked="false" tabindex="0" aria-label="2 звезды">★</span>
+              <span class="star" data-value="3" role="radio" aria-checked="false" tabindex="0" aria-label="3 звезды">★</span>
+              <span class="star" data-value="4" role="radio" aria-checked="false" tabindex="0" aria-label="4 звезды">★</span>
+              <span class="star" data-value="5" role="radio" aria-checked="false" tabindex="0" aria-label="5 звёзд">★</span>
+            </div>
+            <input type="hidden" id="lk-review-rating" value="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lk-review-text">Текст отзыва</label>
+            <textarea class="form-textarea form-input" id="lk-review-text" rows="4" required placeholder="Поделитесь впечатлениями о нашей работе..."></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center">Отправить отзыв</button>
+        </form>
+      </section>
+
+    </div><!-- /lk-content -->
+  </div><!-- /lk-container -->
+</main>
+
+<div id="lk-toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="./js/main.js"></script>
+<script src="./js/lk.js"></script>
+</body>
+</html>
