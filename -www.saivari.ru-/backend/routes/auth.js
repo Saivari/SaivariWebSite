@@ -80,4 +80,32 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// PATCH /api/auth/profile
+router.patch('/profile', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Не авторизован' });
+  const { name, phone, password } = req.body;
+  try {
+    const session = await query(
+      'SELECT user_id FROM sessions WHERE token=$1', [token]
+    );
+    if (!session.rows.length) return res.status(401).json({ error: 'Сессия недействительна' });
+    const userId = session.rows[0].user_id;
+    const updates = ['name=$1', 'phone=$2'];
+    const values  = [name, phone || null];
+    if (password && password.length >= 6) {
+      updates.push(`password_hash=$${updates.length + 1}`);
+      values.push(hashPassword(password));
+    }
+    values.push(userId);
+    await query(
+      `UPDATE users SET ${updates.join(', ')} WHERE id=$${values.length}`,
+      values
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
