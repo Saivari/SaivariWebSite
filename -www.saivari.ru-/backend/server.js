@@ -24,7 +24,7 @@ app.use('/api/reviews', reviewsRouter);
 app.use('/api/chat', chatRouter);
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
+app.use((req, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
 
 initDB().then(() => {
   app.listen(PORT, () => {
