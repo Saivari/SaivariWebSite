@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="СайВари — ремонт электроники, наладка компьютерных сетей, настройка компьютеров в Липецке. Выезд на дом." />
+  <title>СайВари — Ремонт электроники и сетей | Липецк</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+  <!-- ===================== СОЦСЕТИ — топ-бар ===================== -->
+  <div class="topbar">
+    <div class="container--wide topbar__inner">
+      <span class="topbar__text">Работаю в Липецке · Выезд на дом</span>
+      <div class="topbar__socials">
+        <a href="https://vk.com/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="ВКонтакте">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.585-1.496c.598-.19 1.365 1.26 2.179 1.815.615.418 1.082.326 1.082.326l2.175-.03s1.137-.071.598-..965c-.044-.073-.314-.661-1.618-1.867-1.366-1.262-1.183-1.057.462-3.238.999-1.333 1.398-2.146 1.273-2.493-.12-.332-.855-.244-.855-.244l-2.447.015s-.181-.025-.315.055c-.132.078-.217.261-.217.261s-.387 1.043-.903 1.93c-1.088 1.85-1.524 1.948-1.703 1.833-.413-.267-.31-1.075-.31-1.648 0-1.793.271-2.54-.529-2.733-.265-.065-.46-.107-1.137-.114-.869-.009-1.604.003-2.02.206-.277.136-.49.44-.36.457.161.022.525.099.719.362.249.341.24 1.107.24 1.107s.143 2.11-.333 2.372c-.327.176-.775-.183-1.737-1.827-.493-.854-.866-1.8-.866-1.8s-.071-.176-.201-.271c-.157-.115-.376-.151-.376-.151l-2.322.015s-.348.01-.476.162c-.112.135-.009.414-.009.414s1.818 4.255 3.878 6.399c1.889 1.97 4.03 1.84 4.03 1.84h.97z"/></svg>
+          ВКонтакте
+        </a>
+        <a href="mailto:info@saivari.ru" class="social-link" aria-label="Gmail">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Gmail
+        </a>
+        <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="YouTube">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75,15.02 15.5,12 9.75,8.98 9.75,15.02" fill="white"/></svg>
+          YouTube
+        </a>
+        <a href="https://max.ru/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Max">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+          Max
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ШАПКА / НАВИГАЦИЯ ===================== -->
+  <header class="header" role="banner">
+    <div class="container--wide">
+      <div class="header__inner">
+
+        <a href="#" class="logo" aria-label="СайВари — перейти на главную">
+          <img src="./assets/images/logo.jpg" alt="Логотип СайВари" width="42" height="42" loading="eager">
+          Сай<span>Вари</span>
+        </a>
+
+        <nav class="nav" role="navigation" aria-label="Основная навигация">
+          <ul class="nav__links" role="list">
+            <li><a href="#services">Услуги</a></li>
+            <li><a href="#how">Как работаю</a></li>
+            <li><a href="#reviews">Отзывы</a></li>
+            <li><a href="#contact">Контакты</a></li>
+          </ul>
+          <a href="#contact" class="btn btn--primary">Оставить заявку</a>
+          <button class="theme-toggle" data-theme-toggle aria-label="Переключить тему"></button>
+        </nav>
+
+        <button class="hamburger" id="hamburger"
+                aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
+          <span></span><span></span><span></span>
+        </button>
+
+      </div>
+    </div>
+
+    <nav class="mobile-menu" id="mobile-menu" role="navigation" aria-label="Мобильное меню">
+      <a href="#services">Услуги</a>
+      <a href="#how">Как работаю</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="#contact">Контакты</a>
+      <a href="#contact" class="btn btn--primary" style="margin-top:var(--space-2);justify-content:center;">
+        Оставить заявку
+      </a>
+    </nav>
+  </header>
+
+
+  <main id="main-content">
+
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" aria-label="Главный экран">
+      <div class="container">
+        <div class="hero__inner">
+          <div class="hero__content">
+            <p class="hero__badge">Работаю в Липецке</p>
+
+            <h1 class="hero__title">
+              Ремонт<br>
+              <em>электроники</em><br>
+              и сетей
+            </h1>
+
+            <p class="hero__desc">
+              Починю ноутбук, настрою домашнюю сеть, установлю ПО.
+              Выезжаю на дом — быстро и с гарантией.
+              Честные цены, без скрытых платежей.
+            </p>
+
+            <div class="hero__actions">
+              <a href="#contact" class="btn btn--primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                Вызвать мастера
+              </a>
+              <a href="#services" class="btn btn--outline">Список услуг</a>
+            </div>
+
+            <div class="hero__stats">
+              <div class="hero__stat">
+                <div class="stat__num">50+</div>
+                <div class="stat__label">выполнено ремонтов</div>
+              </div>
+              <div class="hero__stat">
+                <div class="stat__num">24ч</div>
+                <div class="stat__label">время отклика</div>
+              </div>
+              <div class="hero__stat">
+                <div class="stat__num">100%</div>
+                <div class="stat__label">гарантия на работу</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero__image-wrap">
+            <img
+              class="hero__image"
+              src="./assets/images/logo.jpg"
+              alt="Логотип СайВари"
+              width="220"
+              height="270"
+              loading="eager"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===================== УСЛУГИ ===================== -->
+    <section class="section" id="services" aria-labelledby="services-title">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Чем могу помочь</p>
+          <h2 class="section-title" id="services-title">Услуги</h2>
+          <p class="section-sub">
+            Приезжаю на дом или в офис. Если нужно — заберу устройство в сервис.
+          </p>
+        </div>
+
+        <div class="services-grid">
+          <article class="service-card">
+            <div class="service-card__icon" aria-hidden="true">💻</div>
+            <h3 class="service-card__title">Ремонт ноутбуков и ПК</h3>
+            <p class="service-card__desc">Замена термопасты, чистка от пыли, замена жёсткого диска или оперативной памяти, диагностика неисправностей.</p>
+            <span class="service-card__price">от 20 €</span>
+          </article>
+
+          <article class="service-card">
+            <div class="service-card__icon" aria-hidden="true">📺</div>
+            <h3 class="service-card__title">Ремонт электроники</h3>
+            <p class="service-card__desc">Телевизоры, мониторы, приставки, принтеры. Замена компонентов, пайка, восстановление питания.</p>
+            <span class="service-card__price">от 25 €</span>
+          </article>
+
+          <article class="service-card">
+            <div class="service-card__icon" aria-hidden="true">🌐</div>
+            <h3 class="service-card__title">Наладка сетей</h3>
+            <p class="service-card__desc">Настройка роутера, Wi-Fi покрытие по всей квартире, прокладка кабеля, устранение проблем с интернетом.</p>
+            <span class="service-card__price">от 30 €</span>
+          </article>
+
+          <article class="service-card">
+            <div class="service-card__icon" aria-hidden="true">⚙️</div>
+            <h3 class="service-card__title">Настройка компьютера</h3>
+            <p class="service-card__desc">Установка Windows/Linux, настройка программ, удаление вирусов, оптимизация и ускорение системы.</p>
+            <span class="service-card__price">от 15 €</span>
+          </article>
+
+          <article class="service-card">
+            <div class="service-card__icon" aria-hidden="true">📱</div>
+            <h3 class="service-card__title">Смартфоны и планшеты</h3>
+            <p class="service-card__desc">Замена экрана, аккумулятора, разъёмов. Восстановление данных. Настройка и обновление прошивки.</p>
+            <span class="service-card__price">от 20 €</span>
+          </article>
+
+          <article class="service-card">
+            <div class="service-card__icon" aria-hidden="true">🛒</div>
+            <h3 class="service-card__title">Б/У техника</h3>
+            <p class="service-card__desc">Продаю проверенную б/у электронику: ноутбуки, телефоны, комплектующие. Всё прошло диагностику.</p>
+            <span class="service-card__price">каталог в разработке</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===================== КАК Я РАБОТАЮ ===================== -->
+    <section class="section section--alt" id="how" aria-labelledby="how-title">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Просто и прозрачно</p>
+          <h2 class="section-title" id="how-title">Как я работаю</h2>
+          <p class="section-sub">Никаких сюрпризов — цена известна до начала работ.</p>
+        </div>
+
+        <div class="steps" role="list">
+          <div class="step" role="listitem">
+            <h3 class="step__title">Заявка</h3>
+            <p class="step__desc">Заполните форму или напишите в мессенджер — опишите проблему и удобное время.</p>
+          </div>
+          <div class="step" role="listitem">
+            <h3 class="step__title">Диагностика</h3>
+            <p class="step__desc">Приеду в удобное время, осмотрю технику и назову точную стоимость работ.</p>
+          </div>
+          <div class="step" role="listitem">
+            <h3 class="step__title">Ремонт</h3>
+            <p class="step__desc">Выполняю работу на месте или забираю на несколько дней, если нужны запчасти.</p>
+          </div>
+          <div class="step" role="listitem">
+            <h3 class="step__title">Гарантия</h3>
+            <p class="step__desc">Даю гарантию на все выполненные работы. При проблемах — вернусь и исправлю бесплатно.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===================== ОТЗЫВЫ ===================== -->
+    <section class="section" id="reviews" aria-labelledby="reviews-title">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Мнения клиентов</p>
+          <h2 class="section-title" id="reviews-title">Отзывы</h2>
+          <p class="section-sub">Реальные отзывы от людей, которым я помог.</p>
+        </div>
+
+        <!-- Список отзывов -->
+        <div class="reviews-grid" id="reviews-list">
+
+          <article class="review-card">
+            <div class="review-card__header">
+              <div class="review-avatar">А</div>
+              <div>
+                <div class="review-author">Алексей М.</div>
+                <div class="review-date">15 мая 2026</div>
+              </div>
+              <div class="review-stars" aria-label="Оценка 5 из 5">★★★★★</div>
+            </div>
+            <p class="review-text">Отличный мастер! Починил ноутбук за пару часов, цена адекватная. Приехал точно в назначенное время. Рекомендую!</p>
+          </article>
+
+          <article class="review-card">
+            <div class="review-card__header">
+              <div class="review-avatar">М</div>
+              <div>
+                <div class="review-author">Марина К.</div>
+                <div class="review-date">3 мая 2026</div>
+              </div>
+              <div class="review-stars" aria-label="Оценка 5 из 5">★★★★★</div>
+            </div>
+            <p class="review-text">Настроил сеть в квартире, теперь Wi-Fi работает везде без мёртвых зон. Объяснил всё доступным языком. Спасибо!</p>
+          </article>
+
+          <article class="review-card">
+            <div class="review-card__header">
+              <div class="review-avatar">С</div>
+              <div>
+                <div class="review-author">Сергей В.</div>
+                <div class="review-date">20 апреля 2026</div>
+              </div>
+              <div class="review-stars" aria-label="Оценка 4 из 5">★★★★☆</div>
+            </div>
+            <p class="review-text">Установил Windows и почистил ноутбук. Работает как новый. Цена чуть выше, чем ожидал, но качество того стоит.</p>
+          </article>
+
+        </div>
+
+        <!-- Форма добавления отзыва -->
+        <div class="review-form-wrap">
+          <h3 class="review-form__title">Оставить отзыв</h3>
+          <form class="review-form" id="review-form" novalidate>
+
+            <div class="review-form__row">
+              <div class="form-group">
+                <label class="form-label" for="review-name">Ваше имя</label>
+                <input class="form-input" id="review-name" name="review-name" type="text"
+                       placeholder="Иван" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="review-rating">Оценка</label>
+                <div class="star-rating" id="star-rating" role="radiogroup" aria-label="Выберите оценку">
+                  <span class="star" data-value="1" role="radio" aria-checked="false" tabindex="0" aria-label="1 звезда">★</span>
+                  <span class="star" data-value="2" role="radio" aria-checked="false" tabindex="0" aria-label="2 звезды">★</span>
+                  <span class="star" data-value="3" role="radio" aria-checked="false" tabindex="0" aria-label="3 звезды">★</span>
+                  <span class="star" data-value="4" role="radio" aria-checked="false" tabindex="0" aria-label="4 звезды">★</span>
+                  <span class="star" data-value="5" role="radio" aria-checked="false" tabindex="0" aria-label="5 звёзд">★</span>
+                </div>
+                <input type="hidden" id="review-rating" name="review-rating" value="0">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="review-text">Ваш отзыв</label>
+              <textarea class="form-textarea" id="review-text" name="review-text"
+                        placeholder="Расскажите о своём опыте..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn--primary">Отправить отзыв</button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ===================== КОНТАКТЫ + КАРТА ===================== -->
+    <section class="section section--alt" id="contact" aria-labelledby="contact-title">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Напишите или приезжайте</p>
+          <h2 class="section-title" id="contact-title">Контакты</h2>
+        </div>
+
+        <div class="contact-grid">
+
+          <!-- Инфо + форма -->
+          <div class="contact-left">
+            <p class="contact-info__text">
+              Отвечаю на заявки в течение нескольких часов.
+              Работаю по Липецку и области.
+            </p>
+
+            <div class="contact-item">
+              <div class="contact-item__icon" aria-hidden="true">📱</div>
+              <div>
+                <div class="contact-item__label">Телефон / WhatsApp</div>
+                <div class="contact-item__value">+7 xxx xxx xx-xx</div>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-item__icon" aria-hidden="true">✉️</div>
+              <div>
+                <div class="contact-item__label">Email</div>
+                <div class="contact-item__value">info@saivari.ru</div>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-item__icon" aria-hidden="true">📍</div>
+              <div>
+                <div class="contact-item__label">Адрес сервиса</div>
+                <div class="contact-item__value">г. Липецк, ул. Индустриальная, 22</div>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-item__icon" aria-hidden="true">🕐</div>
+              <div>
+                <div class="contact-item__label">Режим работы</div>
+                <div class="contact-item__value">Пн–Сб: 9:00 – 20:00</div>
+              </div>
+            </div>
+
+            <!-- Соцсети в контактах -->
+            <div class="contact-socials">
+              <a href="https://vk.com/" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="ВКонтакте">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.585-1.496c.598-.19 1.365 1.26 2.179 1.815.615.418 1.082.326 1.082.326l2.175-.03s1.137-.071.598-.965c-.044-.073-.314-.661-1.618-1.867-1.366-1.262-1.183-1.057.462-3.238.999-1.333 1.398-2.146 1.273-2.493-.12-.332-.855-.244-.855-.244l-2.447.015s-.181-.025-.315.055c-.132.078-.217.261-.217.261s-.387 1.043-.903 1.93c-1.088 1.85-1.524 1.948-1.703 1.833-.413-.267-.31-1.075-.31-1.648 0-1.793.271-2.54-.529-2.733-.265-.065-.46-.107-1.137-.114-.869-.009-1.604.003-2.02.206-.277.136-.49.44-.36.457.161.022.525.099.719.362.249.341.24 1.107.24 1.107s.143 2.11-.333 2.372c-.327.176-.775-.183-1.737-1.827-.493-.854-.866-1.8-.866-1.8s-.071-.176-.201-.271c-.157-.115-.376-.151-.376-.151l-2.322.015s-.348.01-.476.162c-.112.135-.009.414-.009.414s1.818 4.255 3.878 6.399c1.889 1.97 4.03 1.84 4.03 1.84h.97z"/></svg>
+                ВКонтакте
+              </a>
+              <a href="mailto:info@saivari.ru" class="social-btn" aria-label="Gmail">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Gmail
+              </a>
+              <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="YouTube">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75,15.02 15.5,12 9.75,8.98 9.75,15.02" fill="white"/></svg>
+                YouTube
+              </a>
+              <a href="https://max.ru/" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Max">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+                Max
+              </a>
+            </div>
+          </div>
+
+          <!-- Форма -->
+          <div class="form-card">
+            <form id="contact-form" novalidate aria-label="Форма заявки">
+
+              <div class="form-group">
+                <label class="form-label" for="name">Ваше имя</label>
+                <input class="form-input" id="name" name="name" type="text"
+                       placeholder="Иван Иванов" required autocomplete="name"/>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="phone">Телефон или email</label>
+                <input class="form-input" id="phone" name="phone" type="text"
+                       placeholder="+7 xxx или email@mail.ru" required/>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="service">Услуга</label>
+                <select class="form-select form-input" id="service" name="service">
+                  <option value="">— выберите услугу —</option>
+                  <option>Ремонт ноутбука / ПК</option>
+                  <option>Ремонт электроники</option>
+                  <option>Наладка сети</option>
+                  <option>Настройка компьютера</option>
+                  <option>Смартфон / планшет</option>
+                  <option>Другое</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="message">Опишите проблему</label>
+                <textarea class="form-textarea" id="message" name="message"
+                          placeholder="Ноутбук не включается, перегревается..."></textarea>
+              </div>
+
+              <button type="submit" class="btn form-btn">Отправить заявку →</button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Карта Липецка — OpenStreetMap, Индустриальная 22 -->
+        <div class="map-wrap">
+          <div class="map-label">
+            <span>📍</span>
+            <span>г. Липецк, ул. Индустриальная, 22 — сервисный центр</span>
+          </div>
+          <iframe
+            class="map-frame"
+            title="Карта — СайВари, Липецк, Индустриальная 22"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=39.5200%2C52.5800%2C39.5900%2C52.6200&layer=mapnik&marker=52.6068%2C39.5547"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+          <a
+            class="map-link"
+            href="https://www.openstreetmap.org/?mlat=52.6068&mlon=39.5547#map=15/52.6068/39.5547"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Открыть карту в полном размере →
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ===================== ФУТЕР ===================== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <span class="footer__logo">Сай<span>Вари</span></span>
+          <p class="footer__desc">Ремонт электроники и компьютерных сетей в Липецке. Выезд на дом.</p>
+        </div>
+
+        <nav class="footer__nav" aria-label="Навигация в подвале">
+          <div class="footer__nav-col">
+            <div class="footer__nav-title">Услуги</div>
+            <a href="#services">Ремонт ноутбуков</a>
+            <a href="#services">Наладка сетей</a>
+            <a href="#services">Настройка ПК</a>
+          </div>
+          <div class="footer__nav-col">
+            <div class="footer__nav-title">Компания</div>
+            <a href="#how">Как работаю</a>
+            <a href="#reviews">Отзывы</a>
+            <a href="#contact">Контакты</a>
+          </div>
+          <div class="footer__nav-col">
+            <div class="footer__nav-title">Социальные сети</div>
+            <a href="https://vk.com/" target="_blank" rel="noopener noreferrer">ВКонтакте</a>
+            <a href="mailto:info@saivari.ru">Gmail</a>
+            <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer">YouTube</a>
+            <a href="https://max.ru/" target="_blank" rel="noopener noreferrer">Max</a>
+          </div>
+        </nav>
+      </div>
+
+      <div class="footer__bottom">
+        <span class="footer__copy">© 2026 СайВари. Все права защищены.</span>
+        <span class="footer__addr">г. Липецк, ул. Индустриальная, 22</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="./js/main.js"></script>
+</body>
+</html>
