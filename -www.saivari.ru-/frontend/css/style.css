@@ -6,69 +6,123 @@
    1. ДИЗАЙН-ТОКЕНЫ
    ============================================================ */
 
-:root, [data-theme="light"] {
-  --color-bg:               #faf9f7;
-  --color-surface:          #ffffff;
-  --color-surface-2:        #f5f3f0;
-  --color-surface-offset:   #ede9e4;
-  --color-divider:          #e0dbd5;
-  --color-border:           #d4cfc8;
-  --color-text:             #1a1614;
-  --color-text-muted:       #6b6560;
-  --color-text-faint:       #b0aaa3;
-  --color-text-inverse:     #faf9f7;
-  --color-primary:          #8b1a1a;
-  --color-primary-hover:    #6e1414;
-  --color-primary-active:   #4f0e0e;
-  --color-primary-light:    #fdf0f0;
-  --color-primary-mid:      #f5d5d5;
-  --radius-sm:   0.375rem;
-  --radius-md:   0.5rem;
-  --radius-lg:   0.75rem;
-  --radius-xl:   1rem;
+:root,
+[data-theme="light"] {
+  --color-bg: #faf9f7;
+  --color-surface: #ffffff;
+  --color-surface-2: #f5f3f0;
+  --color-surface-offset: #ede9e4;
+  --color-divider: #e0dbd5;
+  --color-border: #d4cfc8;
+
+  --color-text: #1a1614;
+  --color-text-muted: #6b6560;
+  --color-text-faint: #b0aaa3;
+  --color-text-inverse: #faf9f7;
+
+  --color-primary: #8b1a1a;
+  --color-primary-hover: #6e1414;
+  --color-primary-active: #4f0e0e;
+  --color-primary-light: #fdf0f0;
+  --color-primary-mid: #f5d5d5;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
   --radius-full: 9999px;
-  --shadow-sm: 0 1px 3px  rgba(26,10,10,0.07);
-  --shadow-md: 0 4px 14px rgba(26,10,10,0.09);
-  --shadow-lg: 0 12px 36px rgba(26,10,10,0.13);
-  --transition: 180ms cubic-bezier(0.16,1,0.3,1);
-  --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
-  --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
-  --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
-  --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
-  --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
-  --text-2xl:  clamp(2rem,     1.2rem  + 2.5vw,  3.5rem);
-  --text-hero: clamp(2.5rem,   1rem    + 4vw,    4.5rem);
-  --space-1:  0.25rem;
-  --space-2:  0.5rem;
-  --space-3:  0.75rem;
-  --space-4:  1rem;
-  --space-5:  1.25rem;
-  --space-6:  1.5rem;
-  --space-8:  2rem;
+
+  --shadow-sm: 0 1px 3px rgba(26, 10, 10, 0.07);
+  --shadow-md: 0 4px 14px rgba(26, 10, 10, 0.09);
+  --shadow-lg: 0 12px 36px rgba(26, 10, 10, 0.13);
+
+  --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+  --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+  --text-hero: clamp(2.5rem, 1rem + 4vw, 4.5rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
   --space-10: 2.5rem;
   --space-12: 3rem;
   --space-16: 4rem;
   --space-20: 5rem;
   --space-24: 6rem;
+
   --font-display: 'Montserrat', 'Arial Black', sans-serif;
-  --font-body:    'Inter', 'Helvetica Neue', sans-serif;
+  --font-body: 'Inter', 'Helvetica Neue', sans-serif;
+
   --content-default: 960px;
-  --content-wide:    1200px;
+  --content-wide: 1200px;
 }
 
 /* ============================================================
    2. БАЗОВЫЕ СТИЛИ
    ============================================================ */
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
+  min-height: 100dvh;
   font-family: var(--font-body);
   font-size: var(--text-base);
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, h4 { font-family: var(--font-display); }
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+p,
+li,
+figcaption {
+  text-wrap: pretty;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video,
+canvas,
+iframe {
+  height: auto;
+}
 
 a {
   color: inherit;
@@ -76,12 +130,37 @@ a {
   transition: color var(--transition);
 }
 
-a, button, [role="button"], input, textarea, select {
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a,
+button,
+[role="button"],
+input,
+textarea,
+select {
   transition:
     color var(--transition),
     background var(--transition),
     border-color var(--transition),
-    box-shadow var(--transition);
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+::selection {
+  background: rgba(139, 26, 26, 0.18);
+  color: var(--color-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
 }
 
 /* ============================================================
@@ -89,9 +168,15 @@ a, button, [role="button"], input, textarea, select {
    ============================================================ */
 
 .sr-only {
-  position: absolute; width: 1px; height: 1px;
-  padding: 0; margin: -1px; overflow: hidden;
-  clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 .container {
@@ -109,7 +194,9 @@ a, button, [role="button"], input, textarea, select {
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
+  min-height: 44px;
   padding: var(--space-3) var(--space-6);
   font-size: var(--text-sm);
   font-weight: 600;
@@ -118,6 +205,7 @@ a, button, [role="button"], input, textarea, select {
   white-space: nowrap;
   cursor: pointer;
   border: none;
+  text-align: center;
 }
 
 .btn--primary {
@@ -125,21 +213,28 @@ a, button, [role="button"], input, textarea, select {
   color: #fff;
   box-shadow: var(--shadow-sm);
 }
+
 .btn--primary:hover {
   background: var(--color-primary-hover);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
-.btn--primary:active { transform: translateY(0); }
+
+.btn--primary:active {
+  transform: translateY(0);
+  background: var(--color-primary-active);
+}
 
 .btn--outline {
   border: 1.5px solid var(--color-border);
   color: var(--color-text);
-  background: none;
+  background: transparent;
 }
+
 .btn--outline:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+  background: var(--color-primary-light);
 }
 
 .eyebrow {
@@ -166,7 +261,9 @@ a, button, [role="button"], input, textarea, select {
   line-height: 1.7;
 }
 
-.section-header { margin-bottom: var(--space-10); }
+.section-header {
+  margin-bottom: var(--space-10);
+}
 
 /* ============================================================
    4. ТОП-БАР СОЦСЕТЕЙ
@@ -202,12 +299,16 @@ a, button, [role="button"], input, textarea, select {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  color: rgba(255,255,255,0.85);
+  min-height: 32px;
+  color: rgba(255, 255, 255, 0.85);
   font-size: var(--text-xs);
   font-weight: 500;
   white-space: nowrap;
 }
-.social-link:hover { color: #fff; }
+
+.social-link:hover {
+  color: #fff;
+}
 
 /* ============================================================
    5. HEADER
@@ -227,7 +328,8 @@ a, button, [role="button"], input, textarea, select {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-6);
-  height: 70px;
+  min-height: 70px;
+  padding-block: var(--space-2);
 }
 
 .logo {
@@ -241,8 +343,18 @@ a, button, [role="button"], input, textarea, select {
   letter-spacing: -0.02em;
   flex-shrink: 0;
 }
-.logo img { width: 42px; height: 42px; object-fit: contain; border-radius: var(--radius-sm); }
-.logo span { color: var(--color-primary); }
+
+.logo img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.logo > span > span:first-of-type,
+.logo .logo-accent {
+  color: var(--color-primary);
+}
 
 .nav {
   display: flex;
@@ -255,26 +367,41 @@ a, button, [role="button"], input, textarea, select {
   align-items: center;
   gap: var(--space-5);
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
+
 .nav__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: var(--text-sm);
   font-weight: 500;
   color: var(--color-text-muted);
   white-space: nowrap;
 }
+
 .nav__links a:hover,
-.nav__links a.active { color: var(--color-primary); }
+.nav__links a.active {
+  color: var(--color-primary);
+}
 
 .theme-toggle {
-  width: 36px; height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: var(--radius-full);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
-  background: none;
+  background: transparent;
   cursor: pointer;
   flex-shrink: 0;
 }
+
 .theme-toggle:hover {
   color: var(--color-primary);
   border-color: var(--color-primary);
@@ -285,17 +412,22 @@ a, button, [role="button"], input, textarea, select {
   display: none;
   flex-direction: column;
   gap: 5px;
-  width: 36px; height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-md);
-  background: none;
+  background: transparent;
   border: none;
   cursor: pointer;
 }
+
 .hamburger span {
   display: block;
-  width: 22px; height: 2px;
+  width: 22px;
+  height: 2px;
   background: var(--color-text);
   border-radius: 2px;
   transition: transform var(--transition), opacity var(--transition);
@@ -309,16 +441,29 @@ a, button, [role="button"], input, textarea, select {
   border-top: 1px solid var(--color-divider);
   background: var(--color-surface);
 }
-.mobile-menu.open { display: flex; }
+
+.mobile-menu.open {
+  display: flex;
+}
+
 .mobile-menu a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: var(--text-base);
   font-weight: 500;
   color: var(--color-text-muted);
   padding: var(--space-3) 0;
   border-bottom: 1px solid var(--color-divider);
 }
-.mobile-menu a:last-child { border-bottom: none; }
-.mobile-menu a:hover { color: var(--color-primary); }
+
+.mobile-menu a:last-child {
+  border-bottom: none;
+}
+
+.mobile-menu a:hover {
+  color: var(--color-primary);
+}
 
 /* ============================================================
    6. HERO
@@ -334,8 +479,10 @@ a, button, [role="button"], input, textarea, select {
 .hero::before {
   content: '';
   position: absolute;
-  top: -80px; right: -80px;
-  width: 400px; height: 400px;
+  top: -80px;
+  right: -80px;
+  width: 400px;
+  height: 400px;
   border-radius: 50%;
   background: radial-gradient(circle, var(--color-primary-mid) 0%, transparent 70%);
   opacity: 0.4;
@@ -349,12 +496,15 @@ a, button, [role="button"], input, textarea, select {
   align-items: center;
 }
 
-.hero__content { min-width: 0; }
+.hero__content {
+  min-width: 0;
+}
 
 .hero__badge {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  min-height: 32px;
   font-size: var(--text-xs);
   font-weight: 600;
   text-transform: uppercase;
@@ -366,7 +516,11 @@ a, button, [role="button"], input, textarea, select {
   border-radius: var(--radius-full);
   margin-bottom: var(--space-4);
 }
-.hero__badge::before { content: '●'; font-size: 8px; }
+
+.hero__badge::before {
+  content: '●';
+  font-size: 8px;
+}
 
 .hero__title {
   font-size: var(--text-hero);
@@ -376,7 +530,11 @@ a, button, [role="button"], input, textarea, select {
   margin-bottom: var(--space-5);
   line-height: 1.1;
 }
-.hero__title em { font-style: normal; color: var(--color-primary); }
+
+.hero__title em {
+  font-style: normal;
+  color: var(--color-primary);
+}
 
 .hero__desc {
   font-size: var(--text-base);
@@ -393,13 +551,15 @@ a, button, [role="button"], input, textarea, select {
   margin-bottom: var(--space-10);
 }
 
-.hero__image-wrap { flex-shrink: 0; }
+.hero__image-wrap {
+  flex-shrink: 0;
+}
 
 .hero__image {
   width: 220px;
   height: auto;
   opacity: 0.92;
-  filter: drop-shadow(0 16px 32px rgba(139,26,26,0.18));
+  filter: drop-shadow(0 16px 32px rgba(139, 26, 26, 0.18));
   border-radius: var(--radius-xl);
 }
 
@@ -411,7 +571,9 @@ a, button, [role="button"], input, textarea, select {
   flex-wrap: wrap;
 }
 
-.hero__stat { min-width: 80px; }
+.hero__stat {
+  min-width: 80px;
+}
 
 .stat__num {
   font-family: var(--font-display);
@@ -421,6 +583,7 @@ a, button, [role="button"], input, textarea, select {
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
+
 .stat__label {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
@@ -435,7 +598,10 @@ a, button, [role="button"], input, textarea, select {
 .section {
   padding-block: clamp(var(--space-12), 8vw, var(--space-20));
 }
-.section--alt { background: var(--color-surface-2); }
+
+.section--alt {
+  background: var(--color-surface-2);
+}
 
 /* ============================================================
    8. КАРТОЧКИ УСЛУГ
@@ -460,26 +626,36 @@ a, button, [role="button"], input, textarea, select {
 .service-card::after {
   content: '';
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 3px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
   background: var(--color-primary);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--transition);
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  opacity: 0.85;
 }
+
 .service-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-3px);
   border-color: var(--color-primary-mid);
 }
-.service-card:hover::after { transform: scaleX(1); }
+
+.service-card:hover::after {
+  transform: scaleX(1);
+}
 
 .service-card__icon {
-  width: 48px; height: 48px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-lg);
   background: var(--color-primary-light);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: var(--space-4);
   font-size: 22px;
 }
@@ -490,6 +666,7 @@ a, button, [role="button"], input, textarea, select {
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: var(--space-2);
+  line-height: 1.2;
 }
 
 .service-card__desc {
@@ -522,20 +699,21 @@ a, button, [role="button"], input, textarea, select {
 
 .step {
   position: relative;
-  padding-left: 3.5rem;  /* 56px — гарантированно вмещает любой размер цифры */
+  padding-left: 3.5rem;
   counter-increment: steps;
 }
 
 .step::before {
   content: counter(steps, decimal-leading-zero);
   position: absolute;
-  left: 0; top: 0;
+  left: 0;
+  top: 0;
   font-family: var(--font-display);
   font-size: var(--text-xl);
   font-weight: 800;
   color: var(--color-primary-mid);
   line-height: 1;
-  width: 2.75rem;       /* ← явная ширина зоны цифры */
+  width: 2.75rem;
   text-align: left;
 }
 
@@ -545,7 +723,9 @@ a, button, [role="button"], input, textarea, select {
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: var(--space-2);
+  line-height: 1.2;
 }
+
 .step__desc {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
@@ -579,11 +759,14 @@ a, button, [role="button"], input, textarea, select {
 }
 
 .review-avatar {
-  width: 42px; height: 42px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius-full);
   background: var(--color-primary);
   color: #fff;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-display);
   font-size: var(--text-base);
   font-weight: 700;
@@ -618,7 +801,6 @@ a, button, [role="button"], input, textarea, select {
   max-width: none;
 }
 
-/* Форма отзыва */
 .review-form-wrap {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -634,6 +816,7 @@ a, button, [role="button"], input, textarea, select {
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: var(--space-6);
+  line-height: 1.2;
 }
 
 .review-form__row {
@@ -642,7 +825,6 @@ a, button, [role="button"], input, textarea, select {
   gap: var(--space-4);
 }
 
-/* Звёздный рейтинг */
 .star-rating {
   display: flex;
   gap: var(--space-1);
@@ -657,9 +839,15 @@ a, button, [role="button"], input, textarea, select {
   line-height: 1;
   user-select: none;
 }
+
 .star:hover,
-.star.active { color: #e8a000; }
-.star:hover { transform: scale(1.15); }
+.star.active {
+  color: #e8a000;
+}
+
+.star:hover {
+  transform: scale(1.15);
+}
 
 /* ============================================================
    11. КОНТАКТЫ
@@ -673,7 +861,9 @@ a, button, [role="button"], input, textarea, select {
   margin-bottom: var(--space-12);
 }
 
-.contact-left { min-width: 0; }
+.contact-left {
+  min-width: 0;
+}
 
 .contact-info__text {
   font-size: var(--text-base);
@@ -688,14 +878,19 @@ a, button, [role="button"], input, textarea, select {
   gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
+
 .contact-item__icon {
-  width: 40px; height: 40px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-md);
   background: var(--color-primary-light);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 18px;
   flex-shrink: 0;
 }
+
 .contact-item__label {
   font-size: var(--text-xs);
   color: var(--color-text-faint);
@@ -704,6 +899,7 @@ a, button, [role="button"], input, textarea, select {
   font-weight: 600;
   line-height: 1.4;
 }
+
 .contact-item__value {
   font-size: var(--text-base);
   font-weight: 500;
@@ -721,7 +917,9 @@ a, button, [role="button"], input, textarea, select {
 .social-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
+  min-height: 44px;
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
@@ -731,6 +929,7 @@ a, button, [role="button"], input, textarea, select {
   background: var(--color-surface);
   white-space: nowrap;
 }
+
 .social-btn:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
@@ -745,7 +944,9 @@ a, button, [role="button"], input, textarea, select {
   box-shadow: var(--shadow-sm);
 }
 
-.form-group { margin-bottom: var(--space-4); }
+.form-group {
+  margin-bottom: var(--space-4);
+}
 
 .form-label {
   display: block;
@@ -768,15 +969,23 @@ a, button, [role="button"], input, textarea, select {
   border-radius: var(--radius-md);
   outline: none;
 }
+
 .form-input::placeholder,
-.form-textarea::placeholder { color: var(--color-text-faint); }
+.form-textarea::placeholder {
+  color: var(--color-text-faint);
+}
+
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(139,26,26,0.12);
+  box-shadow: 0 0 0 3px rgba(139, 26, 26, 0.12);
 }
-.form-textarea { resize: vertical; min-height: 110px; }
+
+.form-textarea {
+  resize: vertical;
+  min-height: 110px;
+}
 
 .form-select {
   appearance: none;
@@ -788,6 +997,7 @@ a, button, [role="button"], input, textarea, select {
 
 .form-btn {
   width: 100%;
+  min-height: 48px;
   padding: var(--space-4);
   font-size: var(--text-base);
   font-weight: 700;
@@ -800,10 +1010,16 @@ a, button, [role="button"], input, textarea, select {
   border: none;
   transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
 }
+
 .form-btn:hover {
   background: var(--color-primary-hover);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
+}
+
+.form-btn:active {
+  transform: translateY(0);
+  background: var(--color-primary-active);
 }
 
 /* ============================================================
@@ -846,7 +1062,10 @@ a, button, [role="button"], input, textarea, select {
   color: var(--color-primary);
   text-align: right;
 }
-.map-link:hover { text-decoration: underline; }
+
+.map-link:hover {
+  text-decoration: underline;
+}
 
 /* ============================================================
    13. FOOTER
@@ -877,7 +1096,10 @@ a, button, [role="button"], input, textarea, select {
   display: block;
   margin-bottom: var(--space-3);
 }
-.footer__logo span { color: var(--color-primary); }
+
+.footer__logo span {
+  color: var(--color-primary);
+}
 
 .footer__desc {
   font-size: var(--text-sm);
@@ -890,6 +1112,7 @@ a, button, [role="button"], input, textarea, select {
   display: flex;
   gap: var(--space-8);
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .footer__nav-col {
@@ -910,8 +1133,12 @@ a, button, [role="button"], input, textarea, select {
 .footer__nav-col a {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+  min-height: 32px;
 }
-.footer__nav-col a:hover { color: var(--color-primary); }
+
+.footer__nav-col a:hover {
+  color: var(--color-primary);
+}
 
 .footer__bottom {
   display: flex;
@@ -944,81 +1171,198 @@ a, button, [role="button"], input, textarea, select {
   box-shadow: var(--shadow-lg);
   transform: translateY(120%);
   opacity: 0;
-  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
   z-index: 999;
   max-width: 320px;
 }
-.toast.show { transform: translateY(0); opacity: 1; }
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
 
 /* ============================================================
    15. ТЁМНАЯ ТЕМА
    ============================================================ */
 
 [data-theme="dark"] {
-  --color-bg:               #130e0e;
-  --color-surface:          #1c1515;
-  --color-surface-2:        #231b1b;
-  --color-surface-offset:   #2a2020;
-  --color-divider:          #352828;
-  --color-border:           #3f3030;
-  --color-text:             #e8e2df;
-  --color-text-muted:       #8a7f7a;
-  --color-text-faint:       #5a4f4a;
-  --color-text-inverse:     #130e0e;
-  --color-primary:          #d44b4b;
-  --color-primary-hover:    #e06060;
-  --color-primary-active:   #c03535;
-  --color-primary-light:    #1f1010;
-  --color-primary-mid:      #3a1a1a;
-  --shadow-sm: 0 1px 3px  rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 14px rgba(0,0,0,0.4);
-  --shadow-lg: 0 12px 36px rgba(0,0,0,0.5);
+  --color-bg: #130e0e;
+  --color-surface: #1c1515;
+  --color-surface-2: #231b1b;
+  --color-surface-offset: #2a2020;
+  --color-divider: #352828;
+  --color-border: #3f3030;
+
+  --color-text: #e8e2df;
+  --color-text-muted: #8a7f7a;
+  --color-text-faint: #5a4f4a;
+  --color-text-inverse: #130e0e;
+
+  --color-primary: #d44b4b;
+  --color-primary-hover: #e06060;
+  --color-primary-active: #c03535;
+  --color-primary-light: #1f1010;
+  --color-primary-mid: #3a1a1a;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.5);
 }
 
-[data-theme="dark"] .step::before { color: var(--color-border); }
-[data-theme="dark"] .topbar { background: #2a0a0a; }
+[data-theme="dark"] .step::before {
+  color: var(--color-border);
+}
+
+[data-theme="dark"] .topbar {
+  background: #2a0a0a;
+}
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --color-bg: #130e0e; --color-surface: #1c1515;
-    --color-surface-2: #231b1b; --color-surface-offset: #2a2020;
-    --color-divider: #352828; --color-border: #3f3030;
-    --color-text: #e8e2df; --color-text-muted: #8a7f7a;
-    --color-text-faint: #5a4f4a; --color-text-inverse: #130e0e;
-    --color-primary: #d44b4b; --color-primary-hover: #e06060;
-    --color-primary-active: #c03535; --color-primary-light: #1f1010;
+    --color-bg: #130e0e;
+    --color-surface: #1c1515;
+    --color-surface-2: #231b1b;
+    --color-surface-offset: #2a2020;
+    --color-divider: #352828;
+    --color-border: #3f3030;
+
+    --color-text: #e8e2df;
+    --color-text-muted: #8a7f7a;
+    --color-text-faint: #5a4f4a;
+    --color-text-inverse: #130e0e;
+
+    --color-primary: #d44b4b;
+    --color-primary-hover: #e06060;
+    --color-primary-active: #c03535;
+    --color-primary-light: #1f1010;
     --color-primary-mid: #3a1a1a;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 14px rgba(0,0,0,0.4);
-    --shadow-lg: 0 12px 36px rgba(0,0,0,0.5);
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.5);
   }
 }
 
 /* ============================================================
-   16. АДАПТИВНОСТЬ
+   16. REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .btn--primary:hover,
+  .form-btn:hover,
+  .service-card:hover,
+  .star:hover {
+    transform: none !important;
+  }
+
+  .service-card::after,
+  .toast,
+  .hamburger span {
+    transition: none !important;
+  }
+
+  .hero::before {
+    display: none;
+  }
+}
+
+/* ============================================================
+   17. АДАПТИВНОСТЬ
    ============================================================ */
 
 @media (max-width: 900px) {
-  .footer__top { grid-template-columns: 1fr; gap: var(--space-8); }
-  .footer__nav { grid-template-columns: repeat(2, 1fr); }
+  .footer__top {
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .footer__nav {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+  }
 }
 
 @media (max-width: 768px) {
-  .hero__inner { grid-template-columns: 1fr; }
-  .hero__image-wrap { display: none; }
-  .hero__stats { gap: var(--space-5); }
-  .contact-grid { grid-template-columns: 1fr; gap: var(--space-8); }
-  .nav__links, .nav .btn { display: none; }
-  .hamburger { display: flex; }
-  .review-form__row { grid-template-columns: 1fr; }
-  .topbar__text { display: none; }
-  .topbar__socials { gap: var(--space-3); }
+  .hero__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__image-wrap {
+    display: none;
+  }
+
+  .hero__stats {
+    gap: var(--space-5);
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .nav__links,
+  .nav .btn {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .review-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar__text {
+    display: none;
+  }
+
+  .topbar__socials {
+    gap: var(--space-3);
+  }
 }
 
 @media (max-width: 480px) {
-  .hero__stats { flex-wrap: wrap; gap: var(--space-4); }
-  .hero__stat { min-width: calc(50% - var(--space-2)); }
-  .container, .container--wide { padding-inline: var(--space-4); }
-  .footer__nav { grid-template-columns: 1fr; }
-  .map-frame { height: 260px; }
+  .hero__stats {
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .hero__stat {
+    min-width: calc(50% - var(--space-2));
+  }
+
+  .container,
+  .container--wide {
+    padding-inline: var(--space-4);
+  }
+
+  .footer__nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .map-frame {
+    height: 260px;
+  }
+
+  .toast {
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: var(--space-4);
+    max-width: none;
+  }
 }
