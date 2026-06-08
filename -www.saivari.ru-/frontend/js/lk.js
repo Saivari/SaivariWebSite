@@ -108,6 +108,16 @@ el('register-form').addEventListener('submit', async e => {
   const email    = el('reg-email').value.trim();
   const phone    = el('reg-phone').value.trim();
   const password = el('reg-password').value;
+
+  if (!name || !/^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(name))
+  return showAuthError('Имя должно содержать только буквы (минимум 2 символа)');
+if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
+  return showAuthError('Введите корректный email');
+if (password.length < 6)
+  return showAuthError('Пароль минимум 6 символов');
+if (phone && !/^(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(phone))
+  return showAuthError('Введите корректный номер телефона или оставьте поле пустым');
+
   try {
     const r    = await fetch(`${API}/api/auth/register`, {
       method: 'POST',

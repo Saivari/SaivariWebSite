@@ -8,6 +8,28 @@
   padding: var(--space-4);
   backdrop-filter: blur(4px);
 }
+#lk-toast {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: 1100;  /* выше .auth-overlay (1000) */
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+#lk-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .auth-modal {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
