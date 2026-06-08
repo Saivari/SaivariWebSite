@@ -8,14 +8,6 @@ let currentUser  = null;
 let currentOrderId  = null;
 let chatPollInterval = null;
 
-// ── DEV MODE ─────────────────────────────────────────────────
-// Позволяет открывать lk.html напрямую через file:// без сервера.
-// Убрать перед деплоем: удалить весь блок IS_DEV и все if (IS_DEV) {...}
-const IS_DEV = location.protocol === 'file:';
-
-// ─────────────────────────────────────────────────────────────
-
-
 // ── Утилиты ──────────────────────────────────────────────────
 
 function getToken()    { return authToken || sessionStorage.getItem('lk_token'); }
@@ -187,7 +179,7 @@ function initLK() {
   el('lk-review-name').value   = currentUser.name;
 
   // Открыть обзор
-  showPanel('overview');
+  showPanel('profile');
 }
 
 
@@ -198,13 +190,6 @@ async function loadOverview() {
   const nameEl = el('overview-name');
   if (nameEl && currentUser) {
     nameEl.textContent = currentUser.name.split(' ')[0];
-  }
-
-  if (IS_DEV) {
-    el('stat-orders-total')  && (el('stat-orders-total').textContent  = '0');
-    el('stat-orders-active') && (el('stat-orders-active').textContent = '0');
-    el('stat-reviews-total') && (el('stat-reviews-total').textContent = '0');
-    return;
   }
 
   try {
@@ -236,15 +221,6 @@ el('lk-profile-form').addEventListener('submit', async e => {
   if (passNew && passNew.length < 6)    return showToast('Пароль минимум 6 символов', 'error');
   if (passNew && passNew !== passConf)  return showToast('Пароли не совпадают', 'error');
 
-  if (IS_DEV) {
-    currentUser.name  = name;
-    currentUser.phone = phone;
-    el('lk-username').textContent = name;
-    el('lk-avatar').textContent   = name.charAt(0).toUpperCase();
-    showSaveMsg();
-    return;
-  }
-
   try {
     const body = { name, phone };
     if (passNew) body.password = passNew;
@@ -275,7 +251,6 @@ function showSaveMsg() {
   msg.style.display = 'inline';
   setTimeout(() => (msg.style.display = 'none'), 3000);
 }
-
 
 // ── Модалка новой заявки ──────────────────────────────────────
 
@@ -318,11 +293,6 @@ async function loadMyOrders() {
       </p>
     </div>`;
 
-  if (IS_DEV) {
-    list.innerHTML = emptyHtml;
-    return;
-  }
-
   list.innerHTML = '<p style="color:var(--color-text-faint);padding:var(--space-4)">Загрузка...</p>';
 
   try {
@@ -362,6 +332,16 @@ async function loadMyOrders() {
 
 // ── Форма новой заявки ────────────────────────────────────────
 
+function validateName(val) {
+  return /^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(val.trim());
+}
+
+function validateContact(val) {
+  const phone = /^(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(val.trim());
+  const email = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val.trim());
+  return phone || email;
+}
+
 el('lk-order-form').addEventListener('submit', async e => {
   e.preventDefault();
   const name    = el('lk-order-name').value.trim();
@@ -369,17 +349,10 @@ el('lk-order-form').addEventListener('submit', async e => {
   const service = el('lk-order-service').value;
   const message = el('lk-order-message').value.trim();
 
-  if (!name)    return showToast('Укажите имя', 'error');
-  if (!contact) return showToast('Укажите контакт', 'error');
-
-  if (IS_DEV) {
-    showToast('DEV: заявка отправлена (сервер не запущен)');
-    closeNewOrderModal();
-    e.target.reset();
-    el('lk-order-name').value    = currentUser.name;
-    el('lk-order-contact').value = currentUser.phone || currentUser.email;
-    return;
-  }
+  if (!name || !validateName(name))
+  return showToast('Имя должно содержать только буквы (минимум 2 символа)', 'error');
+if (!contact || !validateContact(contact))
+  return showToast('Введите корректный телефон (+7 xxx xxx xx-xx) или email', 'error');
 
   try {
     const r    = await fetch(`${API}/api/orders`, {
@@ -440,11 +413,6 @@ async function loadMyReviews() {
            style="color:var(--color-primary)">Оставьте первый</a>
       </p>
     </div>`;
-
-  if (IS_DEV) {
-    list.innerHTML = emptyHtml;
-    return;
-  }
 
   list.innerHTML = '<p style="color:var(--color-text-faint);padding:var(--space-4)">Загрузка...</p>';
 
@@ -520,16 +488,12 @@ el('lk-review-form').addEventListener('submit', async e => {
   const body   = el('lk-review-text').value.trim();
   const rating = parseInt(el('lk-review-rating').value);
 
-  if (!author)        return showToast('Укажите имя', 'error');
-  if (!body)          return showToast('Напишите текст отзыва', 'error');
-  if (!rating || rating < 1) return showToast('Выберите оценку', 'error');
-
-  if (IS_DEV) {
-    showToast('DEV: отзыв отправлен (сервер не запущен)');
-    closeNewReviewModal();
-    resetReviewForm();
-    return;
-  }
+if (!author || !validateName(author))
+  return showToast('Имя должно содержать только буквы (минимум 2 символа)', 'error');
+if (!body || body.length < 10)
+  return showToast('Напишите отзыв (минимум 10 символов)', 'error');
+if (!rating || rating < 1)
+  return showToast('Выберите оценку', 'error');
 
   try {
     const r    = await fetch(`${API}/api/reviews`, {
@@ -612,11 +576,6 @@ async function sendMessage() {
   if (!message || !currentOrderId) return;
   input.value = '';
 
-  if (IS_DEV) {
-    showToast('DEV: отправка сообщений недоступна без сервера', 'error');
-    return;
-  }
-
   try {
     const r = await fetch(`${API}/api/chat/${currentOrderId}`, {
       method: 'POST',
@@ -640,13 +599,6 @@ el('chat-input')?.addEventListener('keydown', e => {
 async function logout() {
   if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
 
-  if (!IS_DEV) {
-    await fetch(`${API}/api/auth/logout`, {
-      method: 'POST',
-      headers: authHeaders(),
-    }).catch(() => {});
-  }
-
   clearToken();
   currentUser  = null;
   currentOrderId = null;
@@ -663,18 +615,6 @@ async function logout() {
 // ── Старт ─────────────────────────────────────────────────────
 
 async function initApp() {
-  if (IS_DEV) {
-    // В DEV-режиме сразу показываем ЛК с тестовым пользователем
-    currentUser = {
-      id: 1,
-      name:  'Тест Юзер',
-      email: 'test@test.ru',
-      phone: '+7 (900) 123-45-67',
-      role:  'user',
-    };
-    initLK();
-    return;
-  }
 
   const token = getToken();
   if (!token) {

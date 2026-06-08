@@ -104,24 +104,74 @@
   const form = document.getElementById('contact-form');
   if (!form) return;
 
+  const nameInput    = form.querySelector('#name');
+  const contactInput = form.querySelector('#phone');
+
+  // Валидация имени: только буквы (кириллица/латиница), пробелы, дефис, минимум 2 символа
+  function validateName(val) {
+    return /^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(val.trim());
+  }
+
+  // Валидация контакта: телефон (+7/8 + 10 цифр) или email
+  function validateContact(val) {
+    const phone = /^(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(val.trim());
+    const email = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val.trim());
+    return phone || email;
+  }
+
+  function setError(input, msg) {
+    input.classList.add('input--error');
+    let err = input.parentElement.querySelector('.field-error');
+    if (!err) {
+      err = document.createElement('span');
+      err.className = 'field-error';
+      err.style.cssText = 'color:#c0392b;font-size:12px;margin-top:4px;display:block;';
+      input.parentElement.appendChild(err);
+    }
+    err.textContent = msg;
+  }
+
+  function clearError(input) {
+    input.classList.remove('input--error');
+    const err = input.parentElement.querySelector('.field-error');
+    if (err) err.remove();
+  }
+
+  // Очищаем ошибки при вводе
+  nameInput.addEventListener('input', () => clearError(nameInput));
+  contactInput.addEventListener('input', () => clearError(contactInput));
+
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const name    = form.querySelector('#name').value.trim();
-    const contact = form.querySelector('#phone').value.trim();
+    const name    = nameInput.value.trim();
+    const contact = contactInput.value.trim();
     const service = form.querySelector('#service').value;
     const message = form.querySelector('#message').value.trim();
 
+    let hasError = false;
+
     if (!name) {
-      showToast('Пожалуйста, введите ваше имя.', 'error');
-      form.querySelector('#name').focus();
-      return;
+      setError(nameInput, 'Введите ваше имя.');
+      hasError = true;
+    } else if (!validateName(name)) {
+      setError(nameInput, 'Имя должно содержать только буквы (минимум 2 символа).');
+      hasError = true;
+    } else {
+      clearError(nameInput);
     }
+
     if (!contact) {
-      showToast('Укажите телефон или email для связи.', 'error');
-      form.querySelector('#phone').focus();
-      return;
+      setError(contactInput, 'Укажите телефон или email.');
+      hasError = true;
+    } else if (!validateContact(contact)) {
+      setError(contactInput, 'Введите корректный телефон (+7 xxx xxx xx-xx) или email.');
+      hasError = true;
+    } else {
+      clearError(contactInput);
     }
+
+    if (hasError) return;
 
     const btn = form.querySelector('.form-btn');
     const originalText = btn.textContent;
@@ -145,7 +195,6 @@
       }
     } catch (err) {
       showToast('Нет связи с сервером. Попробуйте позже.', 'error');
-      console.error('Fetch error:', err);
     } finally {
       btn.disabled = false;
       btn.textContent = originalText;
@@ -240,14 +289,15 @@
     const text   = form.querySelector('#review-text').value.trim();
     const rating = parseInt(ratingInput.value);
 
-    if (!name) {
-      showToast('Введите ваше имя.', 'error');
-      form.querySelector('#review-name').focus();
+     if (!name) {
+      setFieldError(form.querySelector('#review-name'), 'Введите ваше имя.');
+      return;
+    } else if (!/^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(name)) {
+      setFieldError(form.querySelector('#review-name'), 'Имя должно содержать только буквы.');
       return;
     }
-    if (!text) {
-      showToast('Напишите текст отзыва.', 'error');
-      form.querySelector('#review-text').focus();
+    if (!text || text.length < 10) {
+      setFieldError(form.querySelector('#review-text'), 'Напишите отзыв (минимум 10 символов).');
       return;
     }
     if (!rating || rating < 1) {
@@ -320,6 +370,22 @@
       btn.textContent = originalText;
     }
   });
+
+  function setFieldError(input, msg) {
+    input.classList.add('input--error');
+    let err = input.parentElement.querySelector('.field-error');
+    if (!err) {
+      err = document.createElement('span');
+      err.className = 'field-error';
+      err.style.cssText = 'color:#c0392b;font-size:12px;margin-top:4px;display:block;';
+      input.parentElement.appendChild(err);
+    }
+    err.textContent = msg;
+    input.addEventListener('input', () => {
+      input.classList.remove('input--error');
+      err.remove();
+    }, { once: true });
+  }
 
   function escapeHtml(str) {
     return str

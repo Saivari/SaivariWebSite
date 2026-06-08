@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 
 async function getUser(token) {
   if (!token) return null;
-  const r = await query('SELECT u.id, u.role FROM sessions s JOIN users u ON s.user_id=u.id WHERE s.token=$1', [token]);
+  const r = await query('SELECT u.id, u.role FROM sessions s JOIN users u ON s.user_id=u.id WHERE s.token=$1 AND s.expires_at > NOW()', [token]);
   return r.rows[0] || null;
 }
 
@@ -81,16 +81,24 @@ router.patch('/:id', async (req, res) => {
 });
 
 async function sendEmailNotification(id, name, contact, service, message) {
-  if (!process.env.EMAIL_FROM || !process.env.EMAIL_PASS) return;
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) return;
   const transporter = nodemailer.createTransport({
-    host: 'smtp.resend.com', port: 465, secure: true,
-    auth: { user: 'resend', pass: process.env.EMAIL_PASS },
+    service: 'gmail',
+    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
   });
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
-    to: process.env.EMAIL_TO || process.env.EMAIL_FROM,
+    from: `"СайВари сайт" <${process.env.GMAIL_USER}>`,
+    to: 'saivari.electronics@gmail.com',
+    replyTo: contact.includes('@') ? contact : process.env.GMAIL_USER,
     subject: `Заявка #${id} от ${name}`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:560px;padding:20px;border:1px solid #eee;border-radius:8px"><h2 style="color:#8b1a1a">Заявка #${id}</h2><p><b>Имя:</b> ${name}</p><p><b>Контакт:</b> ${contact}</p><p><b>Услуга:</b> ${service||'—'}</p><p><b>Сообщение:</b> ${message||'—'}</p></div>`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:560px;padding:20px;border:1px solid #eee;border-radius:8px">
+        <h2 style="color:#01696f">Заявка #${id}</h2>
+        <p><b>Имя:</b> ${name}</p>
+        <p><b>Контакт:</b> ${contact}</p>
+        <p><b>Услуга:</b> ${service || '—'}</p>
+        <p><b>Сообщение:</b> ${message || '—'}</p>
+      </div>`,
   });
 }
 

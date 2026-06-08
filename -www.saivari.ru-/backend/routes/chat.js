@@ -6,7 +6,7 @@ async function requireAuth(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Не авторизован' });
   const result = await query(
-    'SELECT u.id, u.role FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = $1',
+    'SELECT u.id, u.role FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = $1 AND s.expires_at > NOW()',
     [token]
   );
   if (!result.rows.length) return res.status(401).json({ error: 'Сессия недействительна' });
@@ -39,6 +39,7 @@ router.post('/:orderId', requireAuth, async (req, res) => {
   const { orderId } = req.params;
   const { message } = req.body;
   if (!message?.trim()) return res.status(400).json({ error: 'Пустое сообщение' });
+  if (message.trim().length > 500) return res.status(400).json({ error: 'Сообщение слишком длинное' });
 
   try {
     if (req.user.role !== 'admin') {
