@@ -95,6 +95,49 @@
   sections.forEach(s => observer.observe(s));
 })();
 
+/* ============================================================
+   МАСКА ТЕЛЕФОНА
+   ============================================================ */
+
+function formatPhoneMask(value) {
+  let digits = String(value || '').replace(/\D/g, '');
+
+  if (!digits) return '';
+  if (digits.startsWith('8')) digits = '7' + digits.slice(1);
+  else if (digits.startsWith('9')) digits = '7' + digits;
+  else if (!digits.startsWith('7')) digits = '7' + digits;
+
+  digits = digits.slice(0, 11);
+
+  let result = '+7';
+  if (digits.length > 1) result += ' (' + digits.slice(1, 4);
+  if (digits.length >= 5) result += ') ' + digits.slice(4, 7);
+  if (digits.length >= 8) result += '-' + digits.slice(7, 9);
+  if (digits.length >= 10) result += '-' + digits.slice(9, 11);
+
+  return result;
+}
+
+function initPhoneMask(input) {
+  if (!input) return;
+
+  input.addEventListener('focus', () => {
+    if (!input.value.trim()) input.value = '+7';
+  });
+
+  input.addEventListener('input', () => {
+    const raw = input.value;
+    const hasAt = raw.includes('@');
+
+    if (hasAt) return; // если человек вводит email, маску не применяем
+
+    input.value = formatPhoneMask(raw);
+  });
+
+  input.addEventListener('blur', () => {
+    if (input.value === '+7') input.value = '';
+  });
+}
 
 /* ============================================================
    4. ФОРМА ЗАЯВКИ
@@ -106,6 +149,8 @@
 
   const nameInput    = form.querySelector('#name');
   const contactInput = form.querySelector('#phone');
+
+  initPhoneMask(contactInput);
 
   // Валидация имени: только буквы (кириллица/латиница), пробелы, дефис, минимум 2 символа
   function validateName(val) {

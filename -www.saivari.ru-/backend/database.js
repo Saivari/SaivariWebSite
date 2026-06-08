@@ -3,7 +3,7 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT) || 5432,
+  port: parseInt(process.env.DB_PORT, 10) || 5432,
   database: process.env.DB_NAME || 'saivari',
   user: process.env.DB_USER || 'saivariuser',
   password: process.env.DB_PASS,
@@ -13,14 +13,18 @@ const pool = new Pool({
 });
 
 pool.connect((err, client, release) => {
-  if (err) { console.error('Ошибка PostgreSQL:', err.message); }
-  else { console.log('PostgreSQL подключён'); release(); }
+  if (err) {
+    console.error('Ошибка PostgreSQL:', err.message);
+  } else {
+    console.log('PostgreSQL подключён');
+    release();
+  }
 });
 
 async function initDB() {
   const client = await pool.connect();
-  try {
 
+  try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -51,7 +55,7 @@ async function initDB() {
         service TEXT,
         message TEXT,
         status TEXT NOT NULL DEFAULT 'new',
-        user_id INTEGER,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `);
@@ -63,7 +67,7 @@ async function initDB() {
         rating SMALLINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
         body TEXT NOT NULL,
         approved BOOLEAN NOT NULL DEFAULT false,
-        user_id INTEGER,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `);
@@ -78,7 +82,17 @@ async function initDB() {
       )
     `);
 
-    console.log('Таблицы инициализированы');
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON reviews(user_id)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_reviews_approved ON reviews(approved)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON reviews(created_at DESC)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_chat_messages_order_id ON chat_messages(order_id)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_chat_messages_created_at ON chat_messages(created_at ASC)`);
+
+    console.log('Таблицы и индексы инициализированы');
   } catch (err) {
     console.error('Ошибка initDB:', err.message);
   } finally {
@@ -86,8 +100,8 @@ async function initDB() {
   }
 }
 
-async function query(sql, params) {
-  return await pool.query(sql, params);
+function query(sql, params) {
+  return pool.query(sql, params);
 }
 
 module.exports = { pool, query, initDB };

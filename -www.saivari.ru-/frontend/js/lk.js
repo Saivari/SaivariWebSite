@@ -57,6 +57,52 @@ function statusLabel(s) {
 // ── Вспомогательный el() ─────────────────────────────────────
 function el(id) { return document.getElementById(id); }
 
+// ── Маска телефона ───────────────────────────────────────────
+
+function formatPhoneMask(value) {
+  let digits = String(value || '').replace(/\D/g, '');
+
+  if (!digits) return '';
+  if (digits.startsWith('8')) digits = '7' + digits.slice(1);
+  else if (digits.startsWith('9')) digits = '7' + digits;
+  else if (!digits.startsWith('7')) digits = '7' + digits;
+
+  digits = digits.slice(0, 11);
+
+  let result = '+7';
+  if (digits.length > 1) result += ' (' + digits.slice(1, 4);
+  if (digits.length >= 5) result += ') ' + digits.slice(4, 7);
+  if (digits.length >= 8) result += '-' + digits.slice(7, 9);
+  if (digits.length >= 10) result += '-' + digits.slice(9, 11);
+
+  return result;
+}
+
+function initPhoneMask(input, allowEmail = false) {
+  if (!input) return;
+
+  input.addEventListener('focus', () => {
+    if (!input.value.trim()) input.value = '+7';
+  });
+
+  input.addEventListener('input', () => {
+    const raw = input.value;
+
+    if (allowEmail && raw.includes('@')) return;
+
+    input.value = formatPhoneMask(raw);
+  });
+
+  input.addEventListener('blur', () => {
+    if (input.value === '+7') input.value = '';
+  });
+}
+
+function initPhoneMasks() {
+  initPhoneMask(el('reg-phone'));
+  initPhoneMask(el('prof-phone'));
+  initPhoneMask(el('lk-order-contact'), true);
+}
 
 // ── Auth modal: переключение вкладок ─────────────────────────
 
@@ -625,6 +671,8 @@ async function logout() {
 // ── Старт ─────────────────────────────────────────────────────
 
 async function initApp() {
+
+  initPhoneMasks();
 
   const token = getToken();
   if (!token) {
