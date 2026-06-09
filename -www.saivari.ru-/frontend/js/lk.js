@@ -10,9 +10,9 @@ let chatPollInterval = null;
 
 // ── Утилиты ──────────────────────────────────────────────────
 
-function getToken()    { return authToken || sessionStorage.getItem('lk_token'); }
-function setToken(t)   { authToken = t; sessionStorage.setItem('lk_token', t); }
-function clearToken()  { authToken = null; sessionStorage.removeItem('lk_token'); }
+function getToken()   { return authToken || localStorage.getItem('lk_token'); }
+function setToken(t)  { authToken = t; localStorage.setItem('lk_token', t); }
+function clearToken() { authToken = null; localStorage.removeItem('lk_token'); }
 
 function authHeaders() {
   const t = getToken();
@@ -150,31 +150,44 @@ el('login-form').addEventListener('submit', async e => {
 
 el('register-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const name     = el('reg-name').value.trim();
-  const email    = el('reg-email').value.trim();
-  const phone    = el('reg-phone').value.trim();
+
+  const name = el('reg-name').value.trim();
+  const email = el('reg-email').value.trim();
+  const phone = el('reg-phone').value.trim();
   const password = el('reg-password').value;
 
-  if (!name || !/^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(name))
-  return showAuthError('Имя должно содержать только буквы (минимум 2 символа)');
-if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
-  return showAuthError('Введите корректный email');
-if (password.length < 6)
-  return showAuthError('Пароль минимум 6 символов');
-if (phone && !/^(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(phone))
-  return showAuthError('Введите корректный номер телефона или оставьте поле пустым');
+  if (!name || !/^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(name)) {
+    return showAuthError('Имя должно содержать только буквы (минимум 2 символа)');
+  }
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    return showAuthError('Введите корректный email');
+  }
+
+  if (password.length < 6) {
+    return showAuthError('Пароль минимум 6 символов');
+  }
+
+  if (phone && !/^(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(phone)) {
+    return showAuthError('Введите корректный номер телефона или оставьте поле пустым');
+  }
 
   try {
-    const r    = await fetch(`${API}/api/auth/register`, {
+    const r = await fetch(`${API}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, phone, password }),
     });
+
     const data = await r.json();
-    if (!r.ok) return showAuthError(data.error || 'Ошибка регистрации');
-    setToken(data.token);
-    currentUser = data.user;
-    initLK();
+
+    if (!r.ok) {
+      return showAuthError(data.error || 'Ошибка регистрации');
+    }
+
+    showToast(data.message || 'Регистрация почти завершена. Проверьте email.');
+    e.target.reset();
+    switchTab('login');
   } catch {
     showAuthError('Ошибка соединения с сервером');
   }
@@ -653,16 +666,25 @@ el('chat-input')?.addEventListener('keydown', e => {
 // ── Выход ─────────────────────────────────────────────────────
 
 async function logout() {
-  if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
+  if (chatPollInterval) {
+    clearInterval(chatPollInterval);
+    chatPollInterval = null;
+  }
+
+  try {
+    await fetch(`${API}/api/auth/logout`, {
+      method: 'POST',
+      headers: authHeaders(),
+    });
+  } catch {}
 
   clearToken();
-  currentUser  = null;
+  currentUser = null;
   currentOrderId = null;
 
-  el('lk-page').style.display      = 'none';
+  el('lk-page').style.display = 'none';
   el('auth-overlay').style.display = 'flex';
 
-  // Сбросить форму входа
   el('login-form')?.reset();
   switchTab('login');
 }
@@ -671,11 +693,12 @@ async function logout() {
 // ── Старт ─────────────────────────────────────────────────────
 
 async function initApp() {
-
   initPhoneMasks();
 
   const token = getToken();
+
   if (!token) {
+    el('lk-page').style.display = 'none';
     el('auth-overlay').style.display = 'flex';
     return;
   }
@@ -684,13 +707,16 @@ async function initApp() {
     const r = await fetch(`${API}/api/auth/me`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
+
     if (!r.ok) throw new Error('Сессия недействительна');
+
     const { user } = await r.json();
     currentUser = user;
     setToken(token);
     initLK();
   } catch {
     clearToken();
+    el('lk-page').style.display = 'none';
     el('auth-overlay').style.display = 'flex';
   }
 }
