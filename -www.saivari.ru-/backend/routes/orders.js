@@ -169,7 +169,7 @@ async function sendEmailNotification(id, name, contact, service, message) {
 
   const transporter = nodemailer.createTransport({
     host: 'smtp.resend.com',
-    port: 465,
+    port: 2465,
     secure: true,
     auth: {
       user: 'resend',
