@@ -1,23 +1,17 @@
 /* ============================================================
    REVIEWS.JS — СайВари
-   Страница /reviews.html
-   - Загружает все отзывы с /api/reviews
-   - Фильтрация по рейтингу
-   - Пагинация (9 отзывов на страницу)
-   - Форма отправки отзыва + звёздный рейтинг
-   - Тема (светлая/тёмная)
-   - Мобильное меню
    ============================================================ */
 
-const PAGE_SIZE = 9; // отзывов на страницу
+const PAGE_SIZE = 9;
 
 /* ── Состояние ── */
-let allReviews   = [];   // все загруженные отзывы
-let filtered     = [];   // после фильтра по рейтингу
+let allReviews   = [];
+let filtered     = [];
 let currentPage  = 1;
-let activeRating = 0;    // 0 = все
+let activeRating = 0;
+let sortMode     = 'date-desc'; // 'date-desc' | 'date-asc' | 'rating-asc' | 'rating-desc'
 
-/* ── DOM-ссылки ── */
+/* ── DOM ── */
 const listEl       = document.getElementById('reviews-list');
 const paginationEl = document.getElementById('pagination');
 const filterEl     = document.getElementById('reviews-filter');
@@ -63,20 +57,21 @@ const filterEl     = document.getElementById('reviews-filter');
 })();
 
 /* ============================================================
-   ЗАГРУЗКА ОТЗЫВОВ
+   ЗАГРУЗКА
    ============================================================ */
 function loadReviews() {
   fetch('/api/reviews')
     .then(r => r.json())
     .then(data => {
       allReviews = data.reviews || [];
-      applyFilter(activeRating);
+      applyFilterAndSort();
     })
     .catch(() => {
-      // Если сервер недоступен — показываем заглушку
       listEl.innerHTML = `
         <div class="empty-state">
-          <div class="empty-state__icon">💬</div>
+          <div class="empty-state__icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
           <h3>Отзывы пока не загружены</h3>
           <p>Не удалось подключиться к серверу. Попробуйте обновить страницу.</p>
           <button class="btn btn--outline" onclick="location.reload()">Обновить</button>
@@ -86,45 +81,82 @@ function loadReviews() {
 }
 
 /* ============================================================
-   ФИЛЬТРАЦИЯ
+   СОРТИРОВКА
    ============================================================ */
-function applyFilter(rating) {
-  activeRating = rating;
-  currentPage  = 1;
-
-  filtered = rating === 0
-    ? allReviews
-    : allReviews.filter(r => r.rating === rating);
-
-  renderPage(currentPage);
-  renderPagination();
+function sortReviews(arr) {
+  const copy = [...arr];
+  switch (sortMode) {
+    case 'date-desc':
+      return copy.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    case 'date-asc':
+      return copy.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    case 'rating-desc':
+      return copy.sort((a, b) => b.rating - a.rating || new Date(b.created_at) - new Date(a.created_at));
+    case 'rating-asc':
+      return copy.sort((a, b) => a.rating - b.rating || new Date(b.created_at) - new Date(a.created_at));
+    default:
+      return copy;
+  }
 }
 
+/* ============================================================
+   ФИЛЬТР + СОРТИРОВКА
+   ============================================================ */
+function applyFilterAndSort() {
+  currentPage = 1;
+  const base = activeRating === 0 ? allReviews : allReviews.filter(r => r.rating === activeRating);
+  filtered = sortReviews(base);
+  renderPage(currentPage);
+  renderPagination();
+  updateSortButtons();
+}
+
+/* Фильтр по рейтингу */
 if (filterEl) {
   filterEl.addEventListener('click', e => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
     filterEl.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    applyFilter(parseInt(btn.dataset.rating));
+    activeRating = parseInt(btn.dataset.rating);
+    applyFilterAndSort();
+  });
+}
+
+/* Сортировка */
+const sortEl = document.getElementById('reviews-sort');
+if (sortEl) {
+  sortEl.addEventListener('click', e => {
+    const btn = e.target.closest('.sort-btn');
+    if (!btn) return;
+    sortMode = btn.dataset.sort;
+    applyFilterAndSort();
+  });
+}
+
+function updateSortButtons() {
+  if (!sortEl) return;
+  sortEl.querySelectorAll('.sort-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sort === sortMode);
   });
 }
 
 /* ============================================================
-   РЕНДЕР СТРАНИЦЫ ОТЗЫВОВ
+   РЕНДЕР
    ============================================================ */
 function renderPage(page) {
   currentPage = page;
   const start = (page - 1) * PAGE_SIZE;
-  const end   = start + PAGE_SIZE;
-  const slice = filtered.slice(start, end);
+  const slice = filtered.slice(start, start + PAGE_SIZE);
 
   if (!slice.length) {
     listEl.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state__icon">🔍</div>
+        <div class="empty-state__icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
         <h3>Отзывов не найдено</h3>
-        <p>По выбранному фильтру отзывов нет. Попробуйте другую оценку.</p>
+        <p>По выбранному фильтру ничего нет. Попробуйте другую оценку.</p>
       </div>`;
     return;
   }
@@ -132,7 +164,7 @@ function renderPage(page) {
   listEl.innerHTML = '';
   slice.forEach((review, i) => {
     const card = buildCard(review);
-    card.style.cssText = 'opacity:0;transform:translateY(10px);transition:opacity 0.3s ease,transform 0.3s ease;transition-delay:' + (i * 40) + 'ms';
+    card.style.cssText = `opacity:0;transform:translateY(12px);transition:opacity 0.28s ease,transform 0.28s ease;transition-delay:${i * 35}ms`;
     listEl.appendChild(card);
     requestAnimationFrame(() => {
       card.style.opacity = '1';
@@ -142,26 +174,40 @@ function renderPage(page) {
 }
 
 /* ============================================================
-   ПОСТРОИТЬ КАРТОЧКУ
+   КАРТОЧКА
    ============================================================ */
 function buildCard(review) {
-  const starsHtml = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
   const date = new Date(review.created_at).toLocaleDateString('ru-RU', {
     day: 'numeric', month: 'long', year: 'numeric'
   });
   const initial = review.author.charAt(0).toUpperCase();
+  const r = review.rating;
+
+  /* Строим звёзды: заполненные + пустые */
+  let starsHtml = '';
+  for (let i = 1; i <= 5; i++) {
+    starsHtml += `<span class="rc-star${i <= r ? ' rc-star--on' : ''}" aria-hidden="true">★</span>`;
+  }
+
+  /* Цвет аватара по первой букве */
+  const avatarColors = ['#8b1a1a','#1a5c8b','#1a8b3f','#7b1a8b','#8b6b1a'];
+  const colorIdx = initial.charCodeAt(0) % avatarColors.length;
+
   const card = document.createElement('article');
-  card.className = 'review-card';
+  card.className = 'rc';
   card.innerHTML = `
-    <div class="review-card__header">
-      <div class="review-avatar">${initial}</div>
-      <div>
-        <div class="review-author">${escapeHtml(review.author)}</div>
-        <div class="review-date">${date}</div>
+    <div class="rc__head">
+      <div class="rc__avatar" style="background:${avatarColors[colorIdx]}" aria-hidden="true">${initial}</div>
+      <div class="rc__meta">
+        <span class="rc__name">${escapeHtml(review.author)}</span>
+        <span class="rc__date">${date}</span>
       </div>
-      <div class="review-stars">${starsHtml}</div>
+      <div class="rc__stars" aria-label="Оценка: ${r} из 5">${starsHtml}</div>
     </div>
-    <p class="review-text">${escapeHtml(review.body)}</p>
+    <p class="rc__body">${escapeHtml(review.body)}</p>
+    <div class="rc__footer">
+      <span class="rc__badge rc__badge--${r}">${r === 5 ? 'Отлично' : r === 4 ? 'Хорошо' : r === 3 ? 'Нормально' : r === 2 ? 'Плохо' : 'Ужасно'}</span>
+    </div>
   `;
   return card;
 }
@@ -170,27 +216,23 @@ function buildCard(review) {
    ПАГИНАЦИЯ
    ============================================================ */
 function renderPagination() {
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
   paginationEl.innerHTML = '';
+  if (total <= 1) return;
 
-  if (totalPages <= 1) return;
-
-  // Кнопка «Назад»
   const prev = document.createElement('button');
   prev.className = 'page-btn';
   prev.setAttribute('aria-label', 'Предыдущая страница');
-  prev.innerHTML = '←';
+  prev.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>';
   prev.disabled = currentPage === 1;
   prev.addEventListener('click', () => goToPage(currentPage - 1));
   paginationEl.appendChild(prev);
 
-  // Номера страниц
-  for (let i = 1; i <= totalPages; i++) {
-    // Показываем: первую, последнюю, текущую ±1, остальные — «…»
-    const isEdge    = i === 1 || i === totalPages;
-    const isNear    = Math.abs(i - currentPage) <= 1;
+  for (let i = 1; i <= total; i++) {
+    const isEdge = i === 1 || i === total;
+    const isNear = Math.abs(i - currentPage) <= 1;
     const isPrevDot = i === currentPage - 2 && currentPage > 3;
-    const isNextDot = i === currentPage + 2 && currentPage < totalPages - 2;
+    const isNextDot = i === currentPage + 2 && currentPage < total - 2;
 
     if (!isEdge && !isNear) {
       if (isPrevDot || isNextDot) {
@@ -201,7 +243,6 @@ function renderPagination() {
       }
       continue;
     }
-
     const btn = document.createElement('button');
     btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
     btn.textContent = i;
@@ -211,12 +252,11 @@ function renderPagination() {
     paginationEl.appendChild(btn);
   }
 
-  // Кнопка «Вперёд»
   const next = document.createElement('button');
   next.className = 'page-btn';
   next.setAttribute('aria-label', 'Следующая страница');
-  next.innerHTML = '→';
-  next.disabled = currentPage === totalPages;
+  next.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
+  next.disabled = currentPage === total;
   next.addEventListener('click', () => goToPage(currentPage + 1));
   paginationEl.appendChild(next);
 }
@@ -228,7 +268,7 @@ function goToPage(page) {
 }
 
 /* ============================================================
-   ФОРМА ОТЗЫВА + ЗВЁЗДНЫЙ РЕЙТИНГ
+   ФОРМА ОТЗЫВА
    ============================================================ */
 (function initReviewForm() {
   const form        = document.getElementById('review-form');
@@ -287,7 +327,6 @@ function goToPage(page) {
         body: JSON.stringify({ author: name, rating, body: text }),
       });
       const data = await res.json();
-
       if (res.ok) {
         form.reset();
         selectedRating = 0;
@@ -312,7 +351,7 @@ function goToPage(page) {
     if (!err) {
       err = document.createElement('span');
       err.className = 'field-error';
-      err.style.cssText = 'color:#c0392b;font-size:12px;margin-top:4px;display:block;';
+      err.style.cssText = 'color:var(--color-primary);font-size:var(--text-xs);margin-top:4px;display:block;';
       input.parentElement.appendChild(err);
     }
     err.textContent = msg;
@@ -324,11 +363,12 @@ function goToPage(page) {
    TOAST
    ============================================================ */
 function showToast(message, type = 'success') {
-  const t = document.createElement('div');
+  const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = message;
-  t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:8px;font-size:14px;color:#fff;max-width:320px;box-shadow:0 4px 16px rgba(0,0,0,0.2);background:${type === 'error' ? '#c0392b' : '#01696f'};animation:slideIn 0.3s ease;`;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 4000);
+  t.style.background = type === 'error' ? 'var(--color-primary)' : '#1a6b3f';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
 }
 
 /* ============================================================
