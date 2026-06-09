@@ -318,7 +318,7 @@ const REVIEWS_PREVIEW_COUNT = 3;
     const label = total ? `Все отзывы (${total})` : 'Все отзывы →';
 
     wrap.innerHTML = `
-      <a href="/reviews.html" class="btn btn--outline" style="display:inline-flex;align-items:center;gap:0.4em;">
+      <a href="/reviews" class="btn btn--outline" style="display:inline-flex;align-items:center;gap:0.4em;">
         ${label}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
           <path d="M5 12h14M12 5l7 7-7 7"/>

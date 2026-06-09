@@ -139,7 +139,7 @@ async function handleSubmit(event) {
       countdownEl.textContent = seconds;
       if (seconds <= 0) {
         clearInterval(timer);
-        window.location.href = '/login.html';
+        window.location.href = '/login';
       }
     }, 1000);
   } catch {

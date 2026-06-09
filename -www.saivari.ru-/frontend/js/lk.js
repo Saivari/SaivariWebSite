@@ -511,7 +511,7 @@ async function logout() {
   currentUser = null;
   currentOrderId = null;
   // Перенаправляем на страницу входа
-  window.location.replace('/login.html');
+  window.location.replace('/login');
 }
 
 // ── Старт: проверка токена, редирект если не авторизован ──────
@@ -522,7 +522,7 @@ async function initApp() {
   const token = getToken();
 
   if (!token) {
-    window.location.replace('/login.html');
+    window.location.replace('/login');
     return;
   }
 
@@ -539,7 +539,7 @@ async function initApp() {
     initLK();
   } catch {
     clearToken();
-    window.location.replace('/login.html');
+    window.location.replace('/login');
   }
 }
 

@@ -127,7 +127,7 @@ el('login-form').addEventListener('submit', async e => {
     }
 
     setToken(data.token);
-    window.location.replace('/lk.html');
+    window.location.replace('/lk');
   } catch {
     showError('login-error', 'Ошибка соединения с сервером');
   } finally {
@@ -195,13 +195,13 @@ el('register-form').addEventListener('submit', async e => {
     // Перешли по ссылке подтверждения — показать сообщение на странице входа
     showSuccess('login-success', '✓ Email подтверждён! Теперь вы можете войти.');
     // Почистить URL
-    history.replaceState(null, '', '/login.html');
+    history.replaceState(null, '', '/login');
   }
 
   if (action === 'login' && token) {
     // Магическая ссылка входа — сразу перенаправить в ЛК
     setToken(token);
-    window.location.replace('/lk.html');
+    window.location.replace('/lk');
   }
 })();
 
@@ -214,6 +214,6 @@ el('register-form').addEventListener('submit', async e => {
   fetch(`${API}/api/auth/me`, {
     headers: { 'Authorization': `Bearer ${token}` }
   })
-    .then(r => { if (r.ok) window.location.replace('/lk.html'); })
+    .then(r => { if (r.ok) window.location.replace('/lk'); })
     .catch(() => { /* игнорируем, остаёмся на странице входа */ });
 })();
