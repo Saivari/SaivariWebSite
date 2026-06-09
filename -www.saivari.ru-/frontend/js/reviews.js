@@ -15,6 +15,7 @@ let sortMode     = 'date-desc';
 const listEl       = document.getElementById('reviews-list');
 const paginationEl = document.getElementById('pagination');
 const filterEl     = document.getElementById('reviews-filter');
+const sortEl       = document.getElementById('reviews-sort');
 
 /* ============================================================
    ТЕМА
@@ -94,21 +95,33 @@ function loadReviews() {
 /* ============================================================
    СОРТИРОВКА
    ============================================================ */
+function parseDate(val) {
+  if (!val) return 0;
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
 function sortReviews(arr) {
   const copy = [...arr];
 
   switch (sortMode) {
     case 'date-desc':
-      return copy.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      return copy.sort((a, b) => parseDate(b.created_at) - parseDate(a.created_at));
 
     case 'date-asc':
-      return copy.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      return copy.sort((a, b) => parseDate(a.created_at) - parseDate(b.created_at));
 
     case 'rating-desc':
-      return copy.sort((a, b) => b.rating - a.rating || new Date(b.created_at) - new Date(a.created_at));
+      return copy.sort((a, b) =>
+        (Number(b.rating) || 0) - (Number(a.rating) || 0) ||
+        parseDate(b.created_at) - parseDate(a.created_at)
+      );
 
     case 'rating-asc':
-      return copy.sort((a, b) => a.rating - b.rating || new Date(b.created_at) - new Date(a.created_at));
+      return copy.sort((a, b) =>
+        (Number(a.rating) || 0) - (Number(b.rating) || 0) ||
+        parseDate(b.created_at) - parseDate(a.created_at)
+      );
 
     default:
       return copy;
@@ -120,14 +133,16 @@ function sortReviews(arr) {
    ============================================================ */
 function applyFilterAndSort() {
   currentPage = 1;
+
   const base = activeRating === 0
     ? allReviews
-    : allReviews.filter(r => r.rating === activeRating);
+    : allReviews.filter(r => Number(r.rating) === activeRating);
 
   filtered = sortReviews(base);
   renderPage(currentPage);
   renderPagination();
   updateSortButtons();
+  updateFilterButtons();
 }
 
 /* Фильтр по рейтингу */
@@ -135,21 +150,16 @@ if (filterEl) {
   filterEl.addEventListener('click', e => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
-
-    filterEl.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeRating = parseInt(btn.dataset.rating, 10);
+    activeRating = parseInt(btn.dataset.rating, 10) || 0;
     applyFilterAndSort();
   });
 }
 
 /* Сортировка */
-const sortEl = document.getElementById('reviews-sort');
 if (sortEl) {
   sortEl.addEventListener('click', e => {
     const btn = e.target.closest('.sort-btn');
     if (!btn) return;
-
     sortMode = btn.dataset.sort;
     applyFilterAndSort();
   });
@@ -159,6 +169,13 @@ function updateSortButtons() {
   if (!sortEl) return;
   sortEl.querySelectorAll('.sort-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.sort === sortMode);
+  });
+}
+
+function updateFilterButtons() {
+  if (!filterEl) return;
+  filterEl.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', (parseInt(b.dataset.rating, 10) || 0) === activeRating);
   });
 }
 
@@ -210,8 +227,8 @@ function buildCard(review) {
     year: 'numeric'
   });
 
-  const initial = review.author.charAt(0).toUpperCase();
-  const r = review.rating;
+  const initial = (review.author || '?').charAt(0).toUpperCase();
+  const r = Number(review.rating) || 0;
 
   let starsHtml = '';
   for (let i = 1; i <= 5; i++) {
@@ -233,7 +250,7 @@ function buildCard(review) {
     <div class="rc__avatar" style="background:${avatarColors[colorIdx]}" aria-hidden="true">${initial}</div>
 
     <div class="rc__meta">
-      <span class="rc__name">${escapeHtml(review.author)}</span>
+      <span class="rc__name">${escapeHtml(review.author || '')}</span>
       <span class="rc__date">${date}</span>
     </div>
 
@@ -242,7 +259,7 @@ function buildCard(review) {
       <span class="rc__badge rc__badge--${r}">${badgeLabel}</span>
     </div>
 
-    <p class="rc__body">${escapeHtml(review.body)}</p>
+    <p class="rc__body">${escapeHtml(review.body || '')}</p>
   `;
 
   return card;
@@ -446,7 +463,7 @@ function showToast(message, type = 'success') {
    УТИЛИТЫ
    ============================================================ */
 function escapeHtml(str) {
-  return str
+  return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
