@@ -128,9 +128,7 @@ function initPhoneMask(input) {
   input.addEventListener('input', () => {
     const raw = input.value;
     const hasAt = raw.includes('@');
-
-    if (hasAt) return; // если человек вводит email, маску не применяем
-
+    if (hasAt) return;
     input.value = formatPhoneMask(raw);
   });
 
@@ -149,6 +147,8 @@ function initPhoneMask(input) {
 
   const nameInput    = form.querySelector('#name');
   const contactInput = form.querySelector('#phone');
+
+  if (!nameInput || !contactInput) return;
 
   initPhoneMask(contactInput);
 
@@ -188,8 +188,10 @@ function initPhoneMask(input) {
 
     const name    = nameInput.value.trim();
     const contact = contactInput.value.trim();
-    const service = form.querySelector('#service').value;
-    const message = form.querySelector('#message').value.trim();
+    const serviceEl = form.querySelector('#service');
+    const service = serviceEl ? serviceEl.value : '';
+    const messageEl = form.querySelector('#message');
+    const message = messageEl ? messageEl.value.trim() : '';
 
     let hasError = false;
 
@@ -215,7 +217,8 @@ function initPhoneMask(input) {
 
     if (hasError) return;
 
-    const btn = form.querySelector('.form-btn');
+    /* Ищем кнопку submit — может быть .form-btn или .btn --primary */
+    const btn = form.querySelector('button[type="submit"]');
     const originalText = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Отправляю...';
@@ -250,7 +253,6 @@ function initPhoneMask(input) {
    Остальные отзывы доступны на странице /reviews.html
    ============================================================ */
 
-/* Количество отзывов на главной странице */
 const REVIEWS_PREVIEW_COUNT = 3;
 
 (function initReviews() {
@@ -267,7 +269,6 @@ const REVIEWS_PREVIEW_COUNT = 3;
     .then(data => {
       if (!data.reviews || !data.reviews.length) return;
 
-      // Берём только первые REVIEWS_PREVIEW_COUNT отзывов
       const preview = data.reviews.slice(0, REVIEWS_PREVIEW_COUNT);
 
       list.innerHTML = '';
@@ -275,14 +276,11 @@ const REVIEWS_PREVIEW_COUNT = 3;
         list.appendChild(buildReviewCard(review));
       });
 
-      // Добавляем кнопку «Все отзывы» если их больше чем REVIEWS_PREVIEW_COUNT
       if (data.reviews.length > REVIEWS_PREVIEW_COUNT) {
         appendShowAllButton(list, data.reviews.length);
       }
     })
     .catch(() => {
-      // Если сервер не отвечает — остаются статичные отзывы из HTML.
-      // Всё равно показываем кнопку «Все отзывы»
       appendShowAllButton(list, null);
     });
 
@@ -311,7 +309,6 @@ const REVIEWS_PREVIEW_COUNT = 3;
 
   // --- Кнопка «Все отзывы» ---
   function appendShowAllButton(container, total) {
-    // Не добавлять повторно
     if (document.getElementById('reviews-show-all')) return;
 
     const wrap = document.createElement('div');
