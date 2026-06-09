@@ -3,15 +3,15 @@
    ============================================================ */
 
 const API = '';
-let authToken    = null;
-let currentUser  = null;
-let currentOrderId  = null;
+let authToken = null;
+let currentUser = null;
+let currentOrderId = null;
 let chatPollInterval = null;
 
 // ── Утилиты ──────────────────────────────────────────────────
 
-function getToken()   { return authToken || localStorage.getItem('lk_token'); }
-function setToken(t)  { authToken = t; localStorage.setItem('lk_token', t); }
+function getToken() { return authToken || localStorage.getItem('lk_token'); }
+function setToken(t) { authToken = t; localStorage.setItem('lk_token', t); }
 function clearToken() { authToken = null; localStorage.removeItem('lk_token'); }
 
 function authHeaders() {
@@ -23,10 +23,10 @@ function authHeaders() {
 
 function escapeHtml(str) {
   return String(str ?? '')
-    .replace(/&/g,  '&amp;')
-    .replace(/</g,  '&lt;')
-    .replace(/>/g,  '&gt;')
-    .replace(/"/g,  '&quot;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 function showToast(msg, type = 'success') {
@@ -46,10 +46,10 @@ function formatDate(iso) {
 
 function statusLabel(s) {
   const map = {
-    new:        'Новая',
+    new: 'Новая',
     inprogress: 'В работе',
-    done:       'Выполнена',
-    cancelled:  'Отменена',
+    done: 'Выполнена',
+    cancelled: 'Отменена',
   };
   return map[s] || s;
 }
@@ -108,7 +108,7 @@ function initPhoneMasks() {
 
 function switchTab(tab) {
   const isLogin = tab === 'login';
-  el('login-form').style.display    = isLogin ? 'flex' : 'none';
+  el('login-form').style.display = isLogin ? 'flex' : 'none';
   el('register-form').style.display = isLogin ? 'none' : 'flex';
   el('tab-login').classList.toggle('active', isLogin);
   el('tab-register').classList.toggle('active', !isLogin);
@@ -118,8 +118,8 @@ function switchTab(tab) {
 function showAuthError(msg) {
   const err = el('auth-error');
   if (!err) return;
-  err.textContent    = msg;
-  err.style.display  = 'block';
+  err.textContent = msg;
+  err.style.display = 'block';
 }
 
 
@@ -127,10 +127,10 @@ function showAuthError(msg) {
 
 el('login-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const email    = el('login-email').value.trim();
+  const email = el('login-email').value.trim();
   const password = el('login-password').value;
   try {
-    const r    = await fetch(`${API}/api/auth/login`, {
+    const r = await fetch(`${API}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -172,6 +172,9 @@ el('register-form').addEventListener('submit', async e => {
     return showAuthError('Введите корректный номер телефона или оставьте поле пустым');
   }
 
+  clearToken();
+  currentUser = null;
+
   try {
     const r = await fetch(`${API}/api/auth/register`, {
       method: 'POST',
@@ -211,7 +214,7 @@ function showPanel(name) {
   });
 
   // Загрузить данные для нужной панели
-  if (name === 'orders')  loadMyOrders();
+  if (name === 'orders') loadMyOrders();
   if (name === 'reviews') loadMyReviews();
   if (name === 'overview') loadOverview();
 
@@ -229,23 +232,23 @@ function initLK() {
   if (!currentUser) return;
 
   el('auth-overlay').style.display = 'none';
-  el('lk-page').style.display      = 'block';
+  el('lk-page').style.display = 'block';
 
   // Сайдбар
   const initial = currentUser.name.charAt(0).toUpperCase();
-  el('lk-avatar').textContent   = initial;
+  el('lk-avatar').textContent = initial;
   el('lk-username').textContent = currentUser.name;
-  el('lk-email').textContent    = currentUser.email;
+  el('lk-email').textContent = currentUser.email;
 
   // Форма профиля
-  el('prof-name').value  = currentUser.name  || '';
+  el('prof-name').value = currentUser.name || '';
   el('prof-email').value = currentUser.email || '';
   el('prof-phone').value = currentUser.phone || '';
 
   // Предзаполнение форм
-  el('lk-order-name').value    = currentUser.name;
+  el('lk-order-name').value = currentUser.name;
   el('lk-order-contact').value = currentUser.phone || currentUser.email;
-  el('lk-review-name').value   = currentUser.name;
+  el('lk-review-name').value = currentUser.name;
 
   // Открыть обзор
   showPanel('profile');
@@ -263,13 +266,13 @@ async function loadOverview() {
 
   try {
     const [ordersR, reviewsR] = await Promise.all([
-      fetch(`${API}/api/orders/my`,  { headers: authHeaders() }),
+      fetch(`${API}/api/orders/my`, { headers: authHeaders() }),
       fetch(`${API}/api/reviews/my`, { headers: authHeaders() }),
     ]);
-    const { orders  = [] } = await ordersR.json();
+    const { orders = [] } = await ordersR.json();
     const { reviews = [] } = await reviewsR.json();
 
-    el('stat-orders-total')  && (el('stat-orders-total').textContent  = orders.length);
+    el('stat-orders-total') && (el('stat-orders-total').textContent = orders.length);
     el('stat-orders-active') && (el('stat-orders-active').textContent =
       orders.filter(o => o.status === 'inprogress').length);
     el('stat-reviews-total') && (el('stat-reviews-total').textContent = reviews.length);
@@ -281,20 +284,20 @@ async function loadOverview() {
 
 el('lk-profile-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const name     = el('prof-name').value.trim();
-  const phone    = el('prof-phone').value.trim();
-  const passNew  = el('prof-pass-new').value;
+  const name = el('prof-name').value.trim();
+  const phone = el('prof-phone').value.trim();
+  const passNew = el('prof-pass-new').value;
   const passConf = el('prof-pass-confirm').value;
 
   if (!name) return showToast('Укажите имя', 'error');
-  if (passNew && passNew.length < 6)    return showToast('Пароль минимум 6 символов', 'error');
-  if (passNew && passNew !== passConf)  return showToast('Пароли не совпадают', 'error');
+  if (passNew && passNew.length < 6) return showToast('Пароль минимум 6 символов', 'error');
+  if (passNew && passNew !== passConf) return showToast('Пароли не совпадают', 'error');
 
   try {
     const body = { name, phone };
     if (passNew) body.password = passNew;
 
-    const r    = await fetch(`${API}/api/auth/profile`, {
+    const r = await fetch(`${API}/api/auth/profile`, {
       method: 'PATCH',
       headers: authHeaders(),
       body: JSON.stringify(body),
@@ -302,12 +305,12 @@ el('lk-profile-form').addEventListener('submit', async e => {
     const data = await r.json();
     if (!r.ok) return showToast(data.error || 'Ошибка сохранения', 'error');
 
-    currentUser.name  = name;
+    currentUser.name = name;
     currentUser.phone = phone;
-    el('lk-username').textContent  = name;
-    el('lk-avatar').textContent    = name.charAt(0).toUpperCase();
-    el('prof-pass-new').value      = '';
-    el('prof-pass-confirm').value  = '';
+    el('lk-username').textContent = name;
+    el('lk-avatar').textContent = name.charAt(0).toUpperCase();
+    el('prof-pass-new').value = '';
+    el('prof-pass-confirm').value = '';
     showSaveMsg();
   } catch {
     showToast('Ошибка сохранения', 'error');
@@ -413,18 +416,18 @@ function validateContact(val) {
 
 el('lk-order-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const name    = el('lk-order-name').value.trim();
+  const name = el('lk-order-name').value.trim();
   const contact = el('lk-order-contact').value.trim();
   const service = el('lk-order-service').value;
   const message = el('lk-order-message').value.trim();
 
   if (!name || !validateName(name))
-  return showToast('Имя должно содержать только буквы (минимум 2 символа)', 'error');
-if (!contact || !validateContact(contact))
-  return showToast('Введите корректный телефон (+7 xxx xxx xx-xx) или email', 'error');
+    return showToast('Имя должно содержать только буквы (минимум 2 символа)', 'error');
+  if (!contact || !validateContact(contact))
+    return showToast('Введите корректный телефон (+7 xxx xxx xx-xx) или email', 'error');
 
   try {
-    const r    = await fetch(`${API}/api/orders`, {
+    const r = await fetch(`${API}/api/orders`, {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify({ name, contact, service, message }),
@@ -435,7 +438,7 @@ if (!contact || !validateContact(contact))
     showToast('Заявка успешно отправлена!');
     closeNewOrderModal();
     e.target.reset();
-    el('lk-order-name').value    = currentUser.name;
+    el('lk-order-name').value = currentUser.name;
     el('lk-order-contact').value = currentUser.phone || currentUser.email;
     showPanel('orders'); // перейти на вкладку заявок после отправки
   } catch {
@@ -502,8 +505,8 @@ async function loadMyReviews() {
           <div class="lk-review-stars">${'★'.repeat(rv.rating)}${'☆'.repeat(5 - rv.rating)}</div>
           <div style="margin-top:var(--space-1)">
             ${rv.approved
-              ? '<span style="font-size:var(--text-xs);color:#2e7d32;font-weight:600">✓ Опубликован</span>'
-              : '<span style="font-size:var(--text-xs);color:var(--color-text-faint)">⏳ На проверке</span>'}
+        ? '<span style="font-size:var(--text-xs);color:#2e7d32;font-weight:600">✓ Опубликован</span>'
+        : '<span style="font-size:var(--text-xs);color:var(--color-text-faint)">⏳ На проверке</span>'}
           </div>
         </div>
       </div>
@@ -554,18 +557,18 @@ function resetReviewForm() {
 el('lk-review-form').addEventListener('submit', async e => {
   e.preventDefault();
   const author = el('lk-review-name').value.trim();
-  const body   = el('lk-review-text').value.trim();
+  const body = el('lk-review-text').value.trim();
   const rating = parseInt(el('lk-review-rating').value);
 
-if (!author || !validateName(author))
-  return showToast('Имя должно содержать только буквы (минимум 2 символа)', 'error');
-if (!body || body.length < 10)
-  return showToast('Напишите отзыв (минимум 10 символов)', 'error');
-if (!rating || rating < 1)
-  return showToast('Выберите оценку', 'error');
+  if (!author || !validateName(author))
+    return showToast('Имя должно содержать только буквы (минимум 2 символа)', 'error');
+  if (!body || body.length < 10)
+    return showToast('Напишите отзыв (минимум 10 символов)', 'error');
+  if (!rating || rating < 1)
+    return showToast('Выберите оценку', 'error');
 
   try {
-    const r    = await fetch(`${API}/api/reviews`, {
+    const r = await fetch(`${API}/api/reviews`, {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify({ author, rating, body }),
@@ -628,7 +631,7 @@ async function loadChatMessages() {
 
 function renderBubble(m) {
   const isMine = m.sender_role !== 'admin';
-  const time   = new Date(m.created_at).toLocaleTimeString('ru-RU', {
+  const time = new Date(m.created_at).toLocaleTimeString('ru-RU', {
     hour: '2-digit', minute: '2-digit',
   });
   return `
@@ -640,7 +643,7 @@ function renderBubble(m) {
 }
 
 async function sendMessage() {
-  const input   = el('chat-input');
+  const input = el('chat-input');
   const message = input?.value.trim();
   if (!message || !currentOrderId) return;
   input.value = '';
@@ -676,7 +679,7 @@ async function logout() {
       method: 'POST',
       headers: authHeaders(),
     });
-  } catch {}
+  } catch { }
 
   clearToken();
   currentUser = null;
