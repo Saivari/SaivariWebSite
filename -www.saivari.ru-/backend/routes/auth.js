@@ -11,8 +11,28 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: 'resend',
-    pass: process.env.RESEND_API_KEY,
+    pass: process.env.EMAIL_PASS,
   },
+});
+
+console.log('EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
+console.log('EMAIL_FROM:', process.env.EMAIL_FROM);
+console.log('APP_URL:', process.env.APP_URL);
+
+if (!process.env.EMAIL_PASS) {
+  throw new Error('EMAIL_PASS is not set');
+}
+
+if (!process.env.EMAIL_FROM) {
+  throw new Error('EMAIL_FROM is not set');
+}
+
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('SMTP verify error:', error);
+  } else {
+    console.log('SMTP transporter is ready');
+  }
 });
 
 function getBaseUrl() {
