@@ -188,9 +188,15 @@ el('register-form').addEventListener('submit', async e => {
       return showAuthError(data.error || 'Ошибка регистрации');
     }
 
-    showToast(data.message || 'Регистрация почти завершена. Проверьте email.');
     e.target.reset();
     switchTab('login');
+
+    el('lk-page').style.display = 'none';
+    el('auth-overlay').style.display = 'flex';
+    el('login-email').value = email;
+    el('login-password').value = '';
+
+    showAuthMessage('Регистрация почти завершена. Проверьте email и подтвердите адрес.', 'success');
   } catch {
     showAuthError('Ошибка соединения с сервером');
   }
@@ -758,4 +764,13 @@ function closeAuthModal() {
   const overlay = el('auth-overlay');
   if (overlay) overlay.style.display = 'none';
   window.location.href = '/';
+}
+
+function showAuthMessage(msg, type = 'error') {
+  const box = el('auth-error');
+  if (!box) return;
+  box.textContent = msg;
+  box.style.display = 'block';
+  box.style.background = type === 'success' ? '#e8f5e9' : '#fce4ec';
+  box.style.color = type === 'success' ? '#2e7d32' : '#c62828';
 }
