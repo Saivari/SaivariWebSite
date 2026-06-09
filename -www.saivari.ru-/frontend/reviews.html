@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ru" data-theme="light">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,14 +20,11 @@
   <link rel="stylesheet" href="./css/reset.css">
   <link rel="stylesheet" href="./css/style.css">
 </head>
-
 <body>
 
-  <!-- ===================== ШАПКА ===================== -->
   <header class="header" role="banner">
     <div class="container--wide">
       <div class="header__inner">
-
         <a href="/" class="logo" aria-label="СайВари — перейти на главную">
           <img src="./assets/images/logo.png" alt="Логотип СайВари" width="42" height="42" loading="eager">
           Сай<span>Вари</span>
@@ -49,7 +45,6 @@
         <button class="hamburger" id="hamburger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
           <span></span><span></span><span></span>
         </button>
-
       </div>
     </div>
 
@@ -63,56 +58,48 @@
     </nav>
   </header>
 
-
   <main id="main-content">
     <section class="section" aria-labelledby="reviews-page-title">
       <div class="container">
 
-        <!-- Заголовок -->
         <div class="section-header">
           <p class="eyebrow">Мнения клиентов</p>
           <h1 class="section-title" id="reviews-page-title">Все отзывы</h1>
-          <p class="section-sub">Реальные отзывы от людей, которым я помог.</p>
+          <p class="section-sub">Реальные отзывы от людей, которым я помог с ремонтом техники и настройкой сетей.</p>
         </div>
 
-        <!-- Панель управления: фильтр + сортировка -->
         <div class="reviews-toolbar">
-
-          <!-- Фильтр по рейтингу -->
           <div class="reviews-filter" id="reviews-filter" role="group" aria-label="Фильтр по оценке">
             <span class="toolbar-label">Оценка:</span>
-            <button class="filter-btn active" data-rating="0">Все</button>
-            <button class="filter-btn" data-rating="5">★★★★★</button>
-            <button class="filter-btn" data-rating="4">★★★★☆</button>
-            <button class="filter-btn" data-rating="3">★★★☆☆</button>
-            <button class="filter-btn" data-rating="2">★★☆☆☆</button>
-            <button class="filter-btn" data-rating="1">★☆☆☆☆</button>
+            <button class="filter-btn active" data-rating="0" type="button">Все</button>
+            <button class="filter-btn" data-rating="5" type="button">★★★★★</button>
+            <button class="filter-btn" data-rating="4" type="button">★★★★☆</button>
+            <button class="filter-btn" data-rating="3" type="button">★★★☆☆</button>
+            <button class="filter-btn" data-rating="2" type="button">★★☆☆☆</button>
+            <button class="filter-btn" data-rating="1" type="button">★☆☆☆☆</button>
           </div>
 
-          <!-- Сортировка -->
           <div class="reviews-sort" id="reviews-sort" role="group" aria-label="Сортировка отзывов">
             <span class="toolbar-label">Сортировка:</span>
-            <button class="sort-btn active" data-sort="date-desc">
+            <button class="sort-btn active" data-sort="date-desc" type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/></svg>
               Новые
             </button>
-            <button class="sort-btn" data-sort="date-asc">
+            <button class="sort-btn" data-sort="date-asc" type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 4h13M3 8h9m-9 4h9m5 4l-4 4m0 0l-4-4m4 4V8"/></svg>
               Старые
             </button>
-            <button class="sort-btn" data-sort="rating-desc">
+            <button class="sort-btn" data-sort="rating-desc" type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               5→1
             </button>
-            <button class="sort-btn" data-sort="rating-asc">
+            <button class="sort-btn" data-sort="rating-asc" type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               1→5
             </button>
           </div>
-
         </div>
 
-        <!-- Список отзывов -->
         <div class="reviews-grid" id="reviews-list" aria-live="polite" aria-label="Список отзывов">
           <div class="reviews-skeleton">
             <div class="skeleton skeleton-card"></div>
@@ -124,10 +111,8 @@
           </div>
         </div>
 
-        <!-- Пагинация -->
         <nav class="pagination" id="pagination" aria-label="Страницы отзывов"></nav>
 
-        <!-- Форма добавления отзыва -->
         <div class="review-form-wrap" style="margin-top: var(--space-16)">
           <h2 class="review-form__title">Оставить отзыв</h2>
           <form class="review-form" id="review-form" novalidate>
@@ -159,13 +144,10 @@
             <button type="submit" class="btn btn--primary">Отправить отзыв</button>
           </form>
         </div>
-
       </div>
     </section>
   </main>
 
-
-  <!-- ===================== ФУТЕР ===================== -->
   <footer class="footer" role="contentinfo">
     <div class="container">
       <div class="footer__top">
@@ -196,5 +178,4 @@
 
   <script src="./js/reviews.js"></script>
 </body>
-
 </html>
