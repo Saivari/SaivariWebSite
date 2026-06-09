@@ -733,21 +733,286 @@ select {
 }
 
 /* ============================================================
-   10. ОТЗЫВЫ
+   10. ОТЗЫВЫ — ТУЛБАР (фильтр + сортировка)
+   ============================================================ */
+
+.reviews-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-8);
+  margin-bottom: var(--space-8);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.reviews-filter,
+.reviews-sort {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.toolbar-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+  margin-right: var(--space-1);
+}
+
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+}
+
+.filter-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.filter-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 34px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+}
+
+.sort-btn svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.sort-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.sort-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.sort-btn.active svg {
+  opacity: 1;
+}
+
+/* Разделитель между фильтром и сортировкой */
+.reviews-filter + .reviews-sort {
+  padding-left: var(--space-8);
+  border-left: 1px solid var(--color-divider);
+}
+
+@media (max-width: 640px) {
+  .reviews-filter + .reviews-sort {
+    padding-left: 0;
+    border-left: none;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-divider);
+    width: 100%;
+  }
+  .reviews-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+}
+
+/* ============================================================
+   10b. ОТЗЫВЫ — КАРТОЧКИ (.rc)
    ============================================================ */
 
 .reviews-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
   gap: var(--space-5);
   margin-bottom: var(--space-12);
 }
 
-.review-card {
+/* Карточка */
+.rc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  padding: var(--space-6);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.rc:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Шапка: аватар + имя/дата + звёзды */
+.rc__head {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.rc__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: -0.01em;
+}
+
+.rc__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rc__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rc__date {
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+}
+
+/* Звёзды */
+.rc__stars {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.rc-star {
+  font-size: 15px;
+  color: var(--color-border);
+  line-height: 1;
+}
+
+.rc-star--on {
+  color: #e8a000;
+}
+
+/* Текст отзыва */
+.rc__body {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  flex: 1;
+  max-width: none;
+}
+
+/* Футер: бейдж оценки */
+.rc__footer {
+  border-top: 1px solid var(--color-divider);
+  padding-top: var(--space-3);
+  margin-top: auto;
+}
+
+.rc__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+
+/* Оценка 5 — зелёный */
+.rc__badge--5 {
+  background: #edf8f1;
+  color: #1f6b3b;
+}
+/* Оценка 4 — сине-зелёный */
+.rc__badge--4 {
+  background: #eaf3fb;
+  color: #1a4f6e;
+}
+/* Оценка 3 — жёлтый */
+.rc__badge--3 {
+  background: #fef9e7;
+  color: #7a5c00;
+}
+/* Оценка 2 — оранжевый */
+.rc__badge--2 {
+  background: #fef3e7;
+  color: #7a3500;
+}
+/* Оценка 1 — красный */
+.rc__badge--1 {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .rc__badge--5 { background: #0a2010; color: #66bb6a; }
+[data-theme="dark"] .rc__badge--4 { background: #0a1a28; color: #5ba3d0; }
+[data-theme="dark"] .rc__badge--3 { background: #1e1800; color: #c8a020; }
+[data-theme="dark"] .rc__badge--2 { background: #1e0e00; color: #c07030; }
+[data-theme="dark"] .rc__badge--1 { background: var(--color-primary-light); color: var(--color-primary); }
+
+/* Прежние стили (review-card, review-author и т.д.) сохраняются для обратной совместимости */
+.review-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
   box-shadow: var(--shadow-sm);
 }
 
@@ -755,12 +1020,11 @@ select {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-4);
 }
 
 .review-avatar {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-full);
   background: var(--color-primary);
   color: #fff;
@@ -777,7 +1041,6 @@ select {
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-text);
-  line-height: 1.3;
 }
 
 .review-date {
@@ -800,6 +1063,10 @@ select {
   line-height: 1.7;
   max-width: none;
 }
+
+/* ============================================================
+   10c. ОТЗЫВЫ — ФОРМА + ПАГИНАЦИЯ
+   ============================================================ */
 
 .review-form-wrap {
   background: var(--color-surface);
@@ -847,6 +1114,131 @@ select {
 
 .star:hover {
   transform: scale(1.15);
+}
+
+/* Пагинация */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-10);
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  padding: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.page-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+  font-weight: 700;
+}
+
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.page-dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  font-size: var(--text-sm);
+  color: var(--color-text-faint);
+}
+
+/* ============================================================
+   10d. ОТЗЫВЫ — EMPTY STATE + SKELETON
+   ============================================================ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-16) var(--space-8);
+  color: var(--color-text-muted);
+  grid-column: 1 / -1;
+}
+
+.empty-state__icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-full);
+  color: var(--color-text-faint);
+  margin-bottom: var(--space-5);
+}
+
+.empty-state h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state p {
+  max-width: 36ch;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+}
+
+/* Skeleton */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-offset) 25%,
+    var(--color-surface-2) 50%,
+    var(--color-surface-offset) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+.reviews-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: var(--space-5);
+  grid-column: 1 / -1;
+}
+
+.skeleton-card {
+  height: 160px;
+  border-radius: var(--radius-xl);
 }
 
 /* ============================================================
@@ -1263,14 +1655,17 @@ select {
   .btn--primary:hover,
   .form-btn:hover,
   .service-card:hover,
-  .star:hover {
+  .star:hover,
+  .rc:hover {
     transform: none !important;
   }
 
   .service-card::after,
   .toast,
-  .hamburger span {
+  .hamburger span,
+  .skeleton {
     transition: none !important;
+    animation: none !important;
   }
 
   .hero::before {
