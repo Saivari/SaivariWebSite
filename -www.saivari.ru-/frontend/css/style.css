@@ -67,6 +67,60 @@
 }
 
 /* ============================================================
+   1b. ТЁМНАЯ ТЕМА
+   ============================================================ */
+
+[data-theme="dark"] {
+  --color-bg: #141210;
+  --color-surface: #1c1917;
+  --color-surface-2: #222019;
+  --color-surface-offset: #2a2722;
+  --color-divider: #322f28;
+  --color-border: #3d3930;
+
+  --color-text: #e8e4de;
+  --color-text-muted: #8c8880;
+  --color-text-faint: #5a5650;
+  --color-text-inverse: #141210;
+
+  --color-primary: #d45a5a;
+  --color-primary-hover: #e07070;
+  --color-primary-active: #b84040;
+  --color-primary-light: #2a1212;
+  --color-primary-mid: #4a2020;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-bg: #141210;
+    --color-surface: #1c1917;
+    --color-surface-2: #222019;
+    --color-surface-offset: #2a2722;
+    --color-divider: #322f28;
+    --color-border: #3d3930;
+
+    --color-text: #e8e4de;
+    --color-text-muted: #8c8880;
+    --color-text-faint: #5a5650;
+    --color-text-inverse: #141210;
+
+    --color-primary: #d45a5a;
+    --color-primary-hover: #e07070;
+    --color-primary-active: #b84040;
+    --color-primary-light: #2a1212;
+    --color-primary-mid: #4a2020;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* ============================================================
    2. БАЗОВЫЕ СТИЛИ
    ============================================================ */
 
@@ -865,11 +919,10 @@ select {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
-  /* skeleton внутри не должен создавать двойную рамку */
   background: var(--color-surface);
 }
 
-/* skeleton-wrapper внутри reviews-grid */
+/* skeleton-wrapper внутри reviews-grid не должен создавать двойную рамку */
 .reviews-grid .reviews-skeleton {
   border: none;
   border-radius: 0;
@@ -1100,6 +1153,99 @@ select {
   transform: scale(1.15);
 }
 
+/* ============================================================
+   10c-2. ФОРМА — ПОЛЯ ВВОДА
+   ============================================================ */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.form-group:last-of-type {
+  margin-bottom: var(--space-6);
+}
+
+.form-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  min-height: 44px;
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--color-text-faint);
+}
+
+.form-input:hover,
+.form-textarea:hover {
+  border-color: var(--color-primary-mid);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 26, 26, 0.12);
+}
+
+.form-input.error,
+.form-textarea.error {
+  border-color: #c0392b;
+}
+
+.form-error {
+  font-size: var(--text-xs);
+  color: #c0392b;
+  margin-top: var(--space-1);
+}
+
+.form-success {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: #edf8f1;
+  border: 1px solid #b7e4c7;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: #1f6b3b;
+  font-weight: 500;
+  margin-top: var(--space-4);
+}
+
+[data-theme="dark"] .form-success {
+  background: #0a2010;
+  border-color: #1a4a28;
+  color: #66bb6a;
+}
+
+/* ============================================================
+   10d-2. ПАГИНАЦИЯ
+   ============================================================ */
+
 .pagination {
   display: flex;
   align-items: center;
@@ -1154,7 +1300,7 @@ select {
 
 
 /* ============================================================
-   10d. ОТЗЫВЫ — EMPTY STATE + SKELETON
+   10e. ОТЗЫВЫ — EMPTY STATE + SKELETON
    ============================================================ */
 
 .empty-state {
@@ -1315,4 +1461,50 @@ select {
   border-color: var(--color-primary);
   color: var(--color-primary);
   background: var(--color-primary-light);
+}
+
+/* ============================================================
+   12. АДАПТИВ (RESPONSIVE)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .nav__links {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .hero__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__image-wrap {
+    display: none;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .review-form__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero__stats {
+    gap: var(--space-5);
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero__actions .btn {
+    width: auto;
+  }
 }
