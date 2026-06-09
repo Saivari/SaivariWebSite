@@ -50,76 +50,8 @@
     </div>
   </header>
 
-  <!-- Auth Modal (показывается если не авторизован) -->
-  <div class="auth-overlay" id="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title"
-    style="display:none">
-    <div class="auth-modal">
-      <button type="button" class="auth-close" onclick="closeAuthModal()" aria-label="Закрыть">✕</button>
-
-      <h2 class="auth-modal-title" id="auth-title">Войдите в аккаунт</h2>
-      <div class="auth-tabs" role="tablist">
-        <button class="auth-tab active" id="tab-login" role="tab" aria-selected="true"
-          onclick="switchTab('login')">Вход</button>
-        <button class="auth-tab" id="tab-register" role="tab" aria-selected="false"
-          onclick="switchTab('register')">Регистрация</button>
-      </div>
-
-      <!-- Форма входа -->
-      <form class="auth-form" id="login-form" novalidate>
-        <div class="form-group">
-          <label class="form-label" for="login-email">Email</label>
-          <input class="form-input" id="login-email" type="email" placeholder="your@email.ru" required
-            autocomplete="email">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="login-password">Пароль</label>
-          <input class="form-input" id="login-password" type="password" placeholder="••••••" required
-            autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center">Войти</button>
-        <p class="auth-hint" style="margin-top:var(--space-2)">
-          <a href="#" onclick="forgotPassword(); return false;" style="color:var(--color-primary)">Забыли пароль?</a>
-        </p>
-        <p class="auth-hint">Нет аккаунта? <a onclick="switchTab('register')">Зарегистрируйтесь</a></p>
-      </form>
-
-      <p class="auth-hint">
-        <a href="/" onclick="closeAuthModal(); return false;">Вернуться на главную</a>
-      </p>
-
-      <!-- Форма регистрации -->
-      <form class="auth-form" id="register-form" novalidate style="display:none">
-        <div class="form-group">
-          <label class="form-label" for="reg-name">Ваше имя</label>
-          <input class="form-input" id="reg-name" type="text" placeholder="Иван Иванов" required autocomplete="name">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="reg-email">Email</label>
-          <input class="form-input" id="reg-email" type="email" placeholder="your@email.ru" required
-            autocomplete="email">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="reg-phone">Телефон (необязательно)</label>
-          <input class="form-input" id="reg-phone" type="tel" placeholder="+7 (900) 000-00-00" autocomplete="tel">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="reg-password">Пароль</label>
-          <input class="form-input" id="reg-password" type="password" placeholder="Минимум 6 символов" required
-            autocomplete="new-password">
-        </div>
-        <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center">Создать
-          аккаунт</button>
-        <p class="auth-hint">Уже есть аккаунт? <a onclick="switchTab('login')">Войдите</a></p>
-      </form>
-
-      <div id="auth-error"
-        style="display:none;margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:#fce4ec;color:#c62828;border-radius:var(--radius-md);font-size:var(--text-sm)">
-      </div>
-    </div>
-  </div>
-
-  <!-- Основной контент ЛК -->
-  <main class="lk-page" id="lk-page" style="display:none">
+  <!-- Основной контент ЛК (всегда виден — защита через JS-редирект в lk.js) -->
+  <main class="lk-page" id="lk-page">
     <div class="lk-container">
       <!-- Сайдбар -->
       <aside class="lk-sidebar">
@@ -176,7 +108,6 @@
       <!-- Панели контента -->
       <div class="lk-content">
 
-        <!-- Обзор -->
         <!-- Профиль -->
         <section class="lk-panel active" id="panel-profile" aria-label="Профиль">
           <h2 class="lk-panel-title">Мой профиль</h2>
@@ -249,9 +180,7 @@
               + Новая заявка
             </button>
           </div>
-          <div id="orders-list">
-            <!-- заглушка пустого состояния -->
-          </div>
+          <div id="orders-list"></div>
         </section>
 
         <!-- Чат по заявке -->
@@ -372,7 +301,7 @@
   </div>
 
   <script src="./js/main.js?v=2"></script>
-  <script src="./js/lk.js?v=2"></script>
+  <script src="./js/lk.js?v=3"></script>
 
 </body>
 

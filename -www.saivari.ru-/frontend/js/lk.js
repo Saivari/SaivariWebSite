@@ -1,5 +1,6 @@
 /* ============================================================
    LK.JS — Личный кабинет пользователя
+   Авторизация вынесена в /login.html
    ============================================================ */
 
 const API = '';
@@ -8,7 +9,7 @@ let currentUser = null;
 let currentOrderId = null;
 let chatPollInterval = null;
 
-// ── Утилиты ──────────────────────────────────────────────────
+// ── Утилиты токена ───────────────────────────────────────────
 
 function getToken() { return authToken || localStorage.getItem('lk_token'); }
 function setToken(t) { authToken = t; localStorage.setItem('lk_token', t); }
@@ -20,6 +21,8 @@ function authHeaders() {
     ? { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` }
     : { 'Content-Type': 'application/json' };
 }
+
+// ── Утилиты ──────────────────────────────────────────────────
 
 function escapeHtml(str) {
   return String(str ?? '')
@@ -54,195 +57,70 @@ function statusLabel(s) {
   return map[s] || s;
 }
 
-// ── Вспомогательный el() ─────────────────────────────────────
 function el(id) { return document.getElementById(id); }
 
 // ── Маска телефона ───────────────────────────────────────────
 
 function formatPhoneMask(value) {
   let digits = String(value || '').replace(/\D/g, '');
-
   if (!digits) return '';
   if (digits.startsWith('8')) digits = '7' + digits.slice(1);
   else if (digits.startsWith('9')) digits = '7' + digits;
   else if (!digits.startsWith('7')) digits = '7' + digits;
-
   digits = digits.slice(0, 11);
-
   let result = '+7';
   if (digits.length > 1) result += ' (' + digits.slice(1, 4);
   if (digits.length >= 5) result += ') ' + digits.slice(4, 7);
   if (digits.length >= 8) result += '-' + digits.slice(7, 9);
   if (digits.length >= 10) result += '-' + digits.slice(9, 11);
-
   return result;
 }
 
 function initPhoneMask(input, allowEmail = false) {
   if (!input) return;
-
   input.addEventListener('focus', () => {
     if (!input.value.trim()) input.value = '+7';
   });
-
   input.addEventListener('input', () => {
-    const raw = input.value;
-
-    if (allowEmail && raw.includes('@')) return;
-
-    input.value = formatPhoneMask(raw);
+    if (allowEmail && input.value.includes('@')) return;
+    input.value = formatPhoneMask(input.value);
   });
-
   input.addEventListener('blur', () => {
     if (input.value === '+7') input.value = '';
   });
 }
 
 function initPhoneMasks() {
-  initPhoneMask(el('reg-phone'));
   initPhoneMask(el('prof-phone'));
   initPhoneMask(el('lk-order-contact'), true);
 }
 
-// ── Auth modal: переключение вкладок ─────────────────────────
-
-function switchTab(tab) {
-  const isLogin = tab === 'login';
-  el('login-form').style.display = isLogin ? 'flex' : 'none';
-  el('register-form').style.display = isLogin ? 'none' : 'flex';
-  el('tab-login').classList.toggle('active', isLogin);
-  el('tab-register').classList.toggle('active', !isLogin);
-  el('auth-error').style.display = 'none';
-}
-
-function showAuthError(msg) {
-  const err = el('auth-error');
-  if (!err) return;
-  err.textContent = msg;
-  err.style.display = 'block';
-}
-
-
-// ── Вход ─────────────────────────────────────────────────────
-
-el('login-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const email = el('login-email').value.trim();
-  const password = el('login-password').value;
-  try {
-    const r = await fetch(`${API}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await r.json();
-    if (!r.ok) return showAuthError(data.error || 'Ошибка входа');
-    setToken(data.token);
-    currentUser = data.user;
-    initLK();
-  } catch {
-    showAuthError('Ошибка соединения с сервером');
-  }
-});
-
-
-// ── Регистрация ───────────────────────────────────────────────
-
-el('register-form').addEventListener('submit', async e => {
-  e.preventDefault();
-
-  const name = el('reg-name').value.trim();
-  const email = el('reg-email').value.trim();
-  const phone = el('reg-phone').value.trim();
-  const password = el('reg-password').value;
-
-  if (!name || !/^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(name)) {
-    return showAuthError('Имя должно содержать только буквы (минимум 2 символа)');
-  }
-
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
-    return showAuthError('Введите корректный email');
-  }
-
-  if (password.length < 6) {
-    return showAuthError('Пароль минимум 6 символов');
-  }
-
-  if (phone && !/^(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(phone)) {
-    return showAuthError('Введите корректный номер телефона или оставьте поле пустым');
-  }
-
-  clearToken();
-  currentUser = null;
-
-  try {
-    const r = await fetch(`${API}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, password }),
-    });
-
-    const data = await r.json();
-
-    if (!r.ok) {
-      return showAuthError(data.error || 'Ошибка регистрации');
-    }
-
-    e.target.reset();
-    switchTab('login');
-
-    el('lk-page').style.display = 'none';
-    el('auth-overlay').style.display = 'flex';
-    el('login-email').value = email;
-    el('login-password').value = '';
-
-    showAuthMessage('Регистрация почти завершена. Проверьте email и подтвердите адрес.', 'success');
-  } catch {
-    showAuthError('Ошибка соединения с сервером');
-  }
-});
-
-
 // ── Навигация по панелям ──────────────────────────────────────
 
 function showPanel(name) {
-  // Скрыть все панели
   document.querySelectorAll('.lk-panel').forEach(p => p.classList.remove('active'));
-
-  // Активировать нужную
   const panel = el(`panel-${name}`);
   if (panel) panel.classList.add('active');
-
-  // Подсветить активную кнопку в сайдбаре
   document.querySelectorAll('.lk-nav-item button').forEach(b => {
     const onclick = b.getAttribute('onclick') || '';
     b.classList.toggle('active', onclick.includes(`'${name}'`));
   });
-
-  // Загрузить данные для нужной панели
   if (name === 'orders') loadMyOrders();
   if (name === 'reviews') loadMyReviews();
   if (name === 'overview') loadOverview();
-
-  // Остановить polling чата, если ушли из чата
   if (name !== 'chat' && chatPollInterval) {
     clearInterval(chatPollInterval);
     chatPollInterval = null;
   }
 }
 
-
 // ── Инициализация ЛК ─────────────────────────────────────────
 
 function initLK() {
   if (!currentUser) return;
 
-  el('auth-overlay').style.display = 'none';
-  el('lk-page').style.display = 'block';
-
   // Сайдбар
-  const initial = currentUser.name.charAt(0).toUpperCase();
-  el('lk-avatar').textContent = initial;
+  el('lk-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
   el('lk-username').textContent = currentUser.name;
   el('lk-email').textContent = currentUser.email;
 
@@ -251,25 +129,19 @@ function initLK() {
   el('prof-email').value = currentUser.email || '';
   el('prof-phone').value = currentUser.phone || '';
 
-  // Предзаполнение форм
+  // Предзаполнение модалок
   el('lk-order-name').value = currentUser.name;
   el('lk-order-contact').value = currentUser.phone || currentUser.email;
   el('lk-review-name').value = currentUser.name;
 
-  // Открыть обзор
   showPanel('profile');
 }
-
 
 // ── Обзор (статистика) ────────────────────────────────────────
 
 async function loadOverview() {
-  // Вывести имя
   const nameEl = el('overview-name');
-  if (nameEl && currentUser) {
-    nameEl.textContent = currentUser.name.split(' ')[0];
-  }
-
+  if (nameEl && currentUser) nameEl.textContent = currentUser.name.split(' ')[0];
   try {
     const [ordersR, reviewsR] = await Promise.all([
       fetch(`${API}/api/orders/my`, { headers: authHeaders() }),
@@ -277,14 +149,12 @@ async function loadOverview() {
     ]);
     const { orders = [] } = await ordersR.json();
     const { reviews = [] } = await reviewsR.json();
-
     el('stat-orders-total') && (el('stat-orders-total').textContent = orders.length);
     el('stat-orders-active') && (el('stat-orders-active').textContent =
       orders.filter(o => o.status === 'inprogress').length);
     el('stat-reviews-total') && (el('stat-reviews-total').textContent = reviews.length);
-  } catch { /* не критично — статистика просто не обновится */ }
+  } catch { /* не критично */ }
 }
-
 
 // ── Профиль — сохранение ─────────────────────────────────────
 
@@ -302,7 +172,6 @@ el('lk-profile-form').addEventListener('submit', async e => {
   try {
     const body = { name, phone };
     if (passNew) body.password = passNew;
-
     const r = await fetch(`${API}/api/auth/profile`, {
       method: 'PATCH',
       headers: authHeaders(),
@@ -310,7 +179,6 @@ el('lk-profile-form').addEventListener('submit', async e => {
     });
     const data = await r.json();
     if (!r.ok) return showToast(data.error || 'Ошибка сохранения', 'error');
-
     currentUser.name = name;
     currentUser.phone = phone;
     el('lk-username').textContent = name;
@@ -330,7 +198,7 @@ function showSaveMsg() {
   setTimeout(() => (msg.style.display = 'none'), 3000);
 }
 
-// ── Модалка новой заявки ──────────────────────────────────────
+// ── Новая заявка ──────────────────────────────────────────────
 
 function showNewOrderModal() {
   const modal = el('new-order-modal');
@@ -342,16 +210,12 @@ function closeNewOrderModal() {
   if (modal) modal.style.display = 'none';
 }
 
-// Закрыть по клику на оверлей
 const orderModal = el('new-order-modal');
 if (orderModal) {
   orderModal.addEventListener('click', e => {
     if (e.target === e.currentTarget) closeNewOrderModal();
   });
 }
-
-
-// ── Загрузка заявок ───────────────────────────────────────────
 
 async function loadMyOrders() {
   const list = el('orders-list');
@@ -377,9 +241,7 @@ async function loadMyOrders() {
     const r = await fetch(`${API}/api/orders/my`, { headers: authHeaders() });
     if (!r.ok) throw new Error();
     const { orders = [] } = await r.json();
-
     if (!orders.length) { list.innerHTML = emptyHtml; return; }
-
     list.innerHTML = orders.map(o => `
       <article class="lk-order-card">
         <div class="lk-order-header">
@@ -406,9 +268,6 @@ async function loadMyOrders() {
     list.innerHTML = '<p style="color:var(--color-error);padding:var(--space-4)">Ошибка загрузки заявок</p>';
   }
 }
-
-
-// ── Форма новой заявки ────────────────────────────────────────
 
 function validateName(val) {
   return /^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(val.trim());
@@ -440,20 +299,18 @@ el('lk-order-form').addEventListener('submit', async e => {
     });
     const data = await r.json();
     if (!r.ok) return showToast(data.error || 'Ошибка отправки', 'error');
-
     showToast('Заявка успешно отправлена!');
     closeNewOrderModal();
     e.target.reset();
     el('lk-order-name').value = currentUser.name;
     el('lk-order-contact').value = currentUser.phone || currentUser.email;
-    showPanel('orders'); // перейти на вкладку заявок после отправки
+    showPanel('orders');
   } catch {
     showToast('Ошибка отправки заявки', 'error');
   }
 });
 
-
-// ── Модалка нового отзыва ─────────────────────────────────────
+// ── Новый отзыв ───────────────────────────────────────────────
 
 function showNewReviewModal() {
   const modal = el('new-review-modal');
@@ -471,9 +328,6 @@ if (reviewModal) {
     if (e.target === e.currentTarget) closeNewReviewModal();
   });
 }
-
-
-// ── Загрузка отзывов ──────────────────────────────────────────
 
 async function loadMyReviews() {
   const list = el('reviews-list');
@@ -498,9 +352,7 @@ async function loadMyReviews() {
     const r = await fetch(`${API}/api/reviews/my`, { headers: authHeaders() });
     if (!r.ok) throw new Error();
     const { reviews = [] } = await r.json();
-
     if (!reviews.length) { list.innerHTML = emptyHtml; return; }
-
     list.innerHTML = reviews.map(rv => `
       <div class="lk-review-card">
         <div style="flex:1;min-width:0">
@@ -521,7 +373,6 @@ async function loadMyReviews() {
     list.innerHTML = '<p style="color:var(--color-error);padding:var(--space-4)">Ошибка загрузки отзывов</p>';
   }
 }
-
 
 // ── Звёздочки ─────────────────────────────────────────────────
 
@@ -553,12 +404,8 @@ function resetReviewForm() {
   lkSelectedRating = 0;
   el('lk-review-rating').value = 0;
   highlightLkStars(0);
-  // Восстановить имя после сброса формы
   if (currentUser) el('lk-review-name').value = currentUser.name;
 }
-
-
-// ── Форма отзыва ─────────────────────────────────────────────
 
 el('lk-review-form').addEventListener('submit', async e => {
   e.preventDefault();
@@ -581,7 +428,6 @@ el('lk-review-form').addEventListener('submit', async e => {
     });
     const data = await r.json();
     if (!r.ok) return showToast(data.error || 'Ошибка отправки', 'error');
-
     showToast('Отзыв отправлен на проверку!');
     closeNewReviewModal();
     resetReviewForm();
@@ -591,25 +437,16 @@ el('lk-review-form').addEventListener('submit', async e => {
   }
 });
 
-
 // ── Чат ──────────────────────────────────────────────────────
 
 function openChat(orderId, title) {
-  // Остановить предыдущий polling если был
-  if (chatPollInterval) {
-    clearInterval(chatPollInterval);
-    chatPollInterval = null;
-  }
-
+  if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
   currentOrderId = orderId;
   const titleEl = el('chat-title');
   if (titleEl) titleEl.textContent = `Чат: ${title}`;
-
-  // Показать панель чата (не через showPanel, чтобы не сбросить polling)
   document.querySelectorAll('.lk-panel').forEach(p => p.classList.remove('active'));
   const chatPanel = el('panel-chat');
   if (chatPanel) chatPanel.classList.add('active');
-
   loadChatMessages();
   chatPollInterval = setInterval(loadChatMessages, 5000);
 }
@@ -618,31 +455,24 @@ async function loadChatMessages() {
   if (!currentOrderId) return;
   const container = el('chat-messages');
   if (!container) return;
-
   try {
     const r = await fetch(`${API}/api/chat/${currentOrderId}`, { headers: authHeaders() });
     if (!r.ok) throw new Error();
     const { messages = [] } = await r.json();
-
-    const wasAtBottom =
-      container.scrollHeight - container.scrollTop <= container.clientHeight + 60;
-
+    const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 60;
     container.innerHTML = messages.length
       ? messages.map(renderBubble).join('')
       : '<div style="text-align:center;color:var(--color-text-faint);padding:var(--space-8)">Нет сообщений. Напишите первым!</div>';
-
     if (wasAtBottom) container.scrollTop = container.scrollHeight;
   } catch { /* polling — молча пропустить */ }
 }
 
 function renderBubble(m) {
   const isMine = m.sender_role !== 'admin';
-  const time = new Date(m.created_at).toLocaleTimeString('ru-RU', {
-    hour: '2-digit', minute: '2-digit',
-  });
+  const time = new Date(m.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
   return `
     <div class="chat-bubble ${isMine ? 'mine' : 'theirs'}">
-      ${!isMine ? `<div class="chat-bubble-sender">Мастер</div>` : ''}
+      ${!isMine ? '<div class="chat-bubble-sender">Мастер</div>' : ''}
       ${escapeHtml(m.message)}
       <div class="chat-bubble-time">${time}</div>
     </div>`;
@@ -653,7 +483,6 @@ async function sendMessage() {
   const message = input?.value.trim();
   if (!message || !currentOrderId) return;
   input.value = '';
-
   try {
     const r = await fetch(`${API}/api/chat/${currentOrderId}`, {
       method: 'POST',
@@ -671,35 +500,21 @@ el('chat-input')?.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 });
 
-
 // ── Выход ─────────────────────────────────────────────────────
 
 async function logout() {
-  if (chatPollInterval) {
-    clearInterval(chatPollInterval);
-    chatPollInterval = null;
-  }
-
+  if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
   try {
-    await fetch(`${API}/api/auth/logout`, {
-      method: 'POST',
-      headers: authHeaders(),
-    });
+    await fetch(`${API}/api/auth/logout`, { method: 'POST', headers: authHeaders() });
   } catch { }
-
   clearToken();
   currentUser = null;
   currentOrderId = null;
-
-  el('lk-page').style.display = 'none';
-  el('auth-overlay').style.display = 'flex';
-
-  el('login-form')?.reset();
-  switchTab('login');
+  // Перенаправляем на страницу входа
+  window.location.replace('/login.html');
 }
 
-
-// ── Старт ─────────────────────────────────────────────────────
+// ── Старт: проверка токена, редирект если не авторизован ──────
 
 async function initApp() {
   initPhoneMasks();
@@ -707,8 +522,7 @@ async function initApp() {
   const token = getToken();
 
   if (!token) {
-    el('lk-page').style.display = 'none';
-    el('auth-overlay').style.display = 'flex';
+    window.location.replace('/login.html');
     return;
   }
 
@@ -725,52 +539,12 @@ async function initApp() {
     initLK();
   } catch {
     clearToken();
-    el('lk-page').style.display = 'none';
-    el('auth-overlay').style.display = 'flex';
+    window.location.replace('/login.html');
   }
 }
 
-// Запуск после загрузки DOM
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
   initApp();
-}
-
-//сброс пароля
-
-async function forgotPassword() {
-  const email = document.getElementById('login-email')?.value?.trim();
-
-  if (!email) {
-    alert('Введите email в поле выше, затем нажмите «Забыли пароль?»');
-    return;
-  }
-
-  try {
-    const res = await fetch('/api/auth/forgot-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const data = await res.json();
-    alert(data.message || data.error);
-  } catch {
-    alert('Ошибка сети. Попробуйте позже.');
-  }
-}
-
-function closeAuthModal() {
-  const overlay = el('auth-overlay');
-  if (overlay) overlay.style.display = 'none';
-  window.location.href = '/';
-}
-
-function showAuthMessage(msg, type = 'error') {
-  const box = el('auth-error');
-  if (!box) return;
-  box.textContent = msg;
-  box.style.display = 'block';
-  box.style.background = type === 'success' ? '#e8f5e9' : '#fce4ec';
-  box.style.color = type === 'success' ? '#2e7d32' : '#c62828';
 }
