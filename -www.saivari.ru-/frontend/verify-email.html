@@ -76,9 +76,7 @@
       display: none;
     }
 
-    .msg.show {
-      display: block;
-    }
+    .msg.show { display: block; }
 
     .msg.success {
       background: #edf8f1;
@@ -112,13 +110,9 @@
       border-top: 1px solid var(--color-divider);
     }
 
-    .resend-box.show {
-      display: block;
-    }
+    .resend-box.show { display: block; }
 
-    .form-group {
-      margin-bottom: var(--space-4);
-    }
+    .form-group { margin-bottom: var(--space-4); }
 
     .helper-text {
       margin-top: var(--space-4);
@@ -128,17 +122,9 @@
     }
 
     @media (max-width: 640px) {
-      .verify-page {
-        padding: var(--space-8) 0;
-      }
-
-      .verify-actions {
-        flex-direction: column;
-      }
-
-      .verify-actions .btn {
-        width: 100%;
-      }
+      .verify-page { padding: var(--space-8) 0; }
+      .verify-actions { flex-direction: column; }
+      .verify-actions .btn { width: 100%; }
     }
   </style>
 </head>
@@ -160,7 +146,6 @@
           <img src="./assets/images/logo.png" alt="" width="42" height="42" loading="eager">
           <span>Sai<span>vari</span></span>
         </a>
-
         <nav class="nav" role="navigation" aria-label="Главная навигация">
           <ul class="nav__links" role="list">
             <li><a href="/#services">Услуги</a></li>
@@ -168,7 +153,7 @@
             <li><a href="/#reviews">Отзывы</a></li>
             <li><a href="/#contact">Контакты</a></li>
           </ul>
-          <a href="/lk.html" class="btn btn--primary">Личный кабинет</a>
+          <a href="/login.html" class="btn btn--primary">Личный кабинет</a>
           <button class="theme-toggle" data-theme-toggle aria-label="Переключить тему"></button>
         </nav>
       </div>
@@ -188,7 +173,7 @@
           <div id="message" class="msg info show">Проверяем ссылку подтверждения…</div>
 
           <div class="verify-actions" id="main-actions" style="display:none;">
-            <a href="/lk.html" class="btn btn--primary">Перейти ко входу</a>
+            <a href="/login.html" class="btn btn--primary">Перейти ко входу</a>
             <a href="/" class="btn btn--outline">На главную</a>
           </div>
 
@@ -208,7 +193,7 @@
               <button type="button" class="btn btn--primary" id="resend-btn">
                 Отправить письмо повторно
               </button>
-              <a href="/lk.html" class="btn btn--outline">Вернуться ко входу</a>
+              <a href="/login.html" class="btn btn--outline">Вернуться ко входу</a>
             </div>
 
             <p class="helper-text">
@@ -221,80 +206,6 @@
   </main>
 
   <script src="./js/main.js?v=2"></script>
-  <script>
-    const token = new URLSearchParams(window.location.search).get('token');
-    const messageEl = document.getElementById('message');
-    const actionsEl = document.getElementById('main-actions');
-    const resendBox = document.getElementById('resend-box');
-    const resendBtn = document.getElementById('resend-btn');
-    const resendEmailInput = document.getElementById('resend-email');
-
-    function setMessage(type, text) {
-      messageEl.className = `msg show ${type}`;
-      messageEl.textContent = text;
-    }
-
-    async function verifyEmail() {
-      if (!token) {
-        setMessage('error', 'Ссылка подтверждения недействительна: токен отсутствует.');
-        resendBox.classList.add('show');
-        return;
-      }
-
-      try {
-        const res = await fetch(`/api/auth/verify-email?token=${encodeURIComponent(token)}`);
-        const data = await res.json();
-
-        if (!res.ok) {
-          setMessage('error', data.error || 'Не удалось подтвердить email.');
-          resendBox.classList.add('show');
-          return;
-        }
-
-        setMessage('success', data.message || 'Email успешно подтверждён. Теперь вы можете войти в аккаунт.');
-        actionsEl.style.display = 'flex';
-      } catch (error) {
-        setMessage('error', 'Ошибка сети. Попробуйте открыть ссылку позже.');
-        resendBox.classList.add('show');
-      }
-    }
-
-    async function resendVerification() {
-      const email = resendEmailInput.value.trim().toLowerCase();
-
-      if (!email) {
-        setMessage('error', 'Введите email для повторной отправки письма.');
-        return;
-      }
-
-      try {
-        resendBtn.disabled = true;
-        resendBtn.textContent = 'Отправляем...';
-
-        const res = await fetch('/api/auth/resend-verification', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          setMessage('error', data.error || 'Не удалось отправить письмо повторно.');
-          return;
-        }
-
-        setMessage('success', data.message || 'Если аккаунт существует, письмо с подтверждением отправлено.');
-      } catch (error) {
-        setMessage('error', 'Ошибка сети. Попробуйте позже.');
-      } finally {
-        resendBtn.disabled = false;
-        resendBtn.textContent = 'Отправить письмо повторно';
-      }
-    }
-
-    resendBtn.addEventListener('click', resendVerification);
-    verifyEmail();
-  </script>
+  <script src="./js/verify-email.js?v=1"></script>
 </body>
 </html>

@@ -1,3 +1,9 @@
+/* ============================================================
+   RESET-PASSWORD.JS — страница сброса пароля
+   Читает ?token= из URL, отправляет новый пароль на /api/auth/reset-password
+   После успеха — редирект на /login.html (не /lk.html)
+   ============================================================ */
+
 const token = new URLSearchParams(window.location.search).get('token');
 
 const formSection = document.getElementById('form-section');
@@ -17,15 +23,11 @@ const resetButtonText = resetButton ? resetButton.querySelector('.btn-text') : n
 let isSubmitting = false;
 
 if (!token) {
-  if (formSection) {
-    formSection.style.display = 'none';
-  }
+  if (formSection) formSection.style.display = 'none';
   showMessage('error', 'Ссылка недействительна. Запросите сброс пароля повторно.');
 }
 
-if (form) {
-  form.addEventListener('submit', handleSubmit);
-}
+if (form) form.addEventListener('submit', handleSubmit);
 
 passwordInput?.addEventListener('input', () => clearFieldError(passwordInput, passwordError));
 password2Input?.addEventListener('input', () => clearFieldError(password2Input, password2Error));
@@ -61,12 +63,9 @@ function clearAllFieldErrors() {
 
 function setSubmittingState(state) {
   isSubmitting = state;
-
   if (!resetButton) return;
-
   resetButton.disabled = state;
   resetButton.classList.toggle('is-loading', state);
-
   if (resetButtonText) {
     resetButtonText.textContent = state ? 'Сохраняем...' : 'Сохранить пароль';
   }
@@ -103,14 +102,8 @@ function validateForm() {
 
 async function handleSubmit(event) {
   event.preventDefault();
-
-  if (isSubmitting || !token) {
-    return;
-  }
-
-  if (!validateForm()) {
-    return;
-  }
+  if (isSubmitting || !token) return;
+  if (!validateForm()) return;
 
   setSubmittingState(true);
 
@@ -137,16 +130,16 @@ async function handleSubmit(event) {
     successBox.classList.add('show');
     successMsg.textContent = data.message || 'Пароль успешно изменён.';
 
+    // Редирект на страницу ВХОДА (не в ЛК — пользователь ещё не авторизован)
     let seconds = 3;
     countdownEl.textContent = seconds;
 
     const timer = setInterval(() => {
       seconds -= 1;
       countdownEl.textContent = seconds;
-
       if (seconds <= 0) {
         clearInterval(timer);
-        window.location.href = '/lk.html';
+        window.location.href = '/login.html';
       }
     }, 1000);
   } catch {
