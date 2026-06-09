@@ -235,4 +235,102 @@ router.patch('/profile', async (req, res) => {
   }
 });
 
+// POST /api/auth/forgot-password
+router.post('/forgot-password', async (req, res) => {
+  const email = String(req.body.email || '').trim().toLowerCase();
+
+  if (!validateEmail(email)) {
+    return res.status(400).json({ error: 'Введите корректный email' });
+  }
+
+  try {
+    const result = await query('SELECT id FROM users WHERE email = $1', [email]);
+
+    // Всегда отвечаем одинаково — чтобы нельзя было проверить существование email
+    if (!result.rows.length) {
+      return res.json({ success: true, message: 'Если email зарегистрирован, письмо отправлено.' });
+    }
+
+    const userId = result.rows[0].id;
+    const token = generateToken();
+
+    // Удаляем старые токены этого пользователя
+    await query('DELETE FROM password_resets WHERE user_id = $1', [userId]);
+
+    // Сохраняем новый токен
+    await query(
+      'INSERT INTO password_resets (user_id, token) VALUES ($1, $2)',
+      [userId, token]
+    );
+
+    const resetLink = `https://saivari.ru/reset-password.html?token=${token}`;
+
+    // Отправляем письмо через Resend SMTP
+    const nodemailer = require('nodemailer');
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.resend.com',
+      port: 2465,
+      secure: true,
+      auth: { user: 'resend', pass: process.env.EMAIL_PASS },
+    });
+
+    await transporter.sendMail({
+      from: `"СайВари" <${process.env.EMAIL_FROM}>`,
+      to: email,
+      subject: 'Сброс пароля — СайВари',
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:520px;padding:24px;border:1px solid #eee;border-radius:8px">
+          <h2 style="color:#01696f">Сброс пароля</h2>
+          <p>Вы запросили сброс пароля на сайте saivari.ru.</p>
+          <p>Нажмите кнопку ниже — ссылка действует <b>1 час</b>:</p>
+          <a href="${resetLink}"
+             style="display:inline-block;margin:16px 0;padding:12px 24px;background:#01696f;color:#fff;border-radius:6px;text-decoration:none;font-weight:bold">
+            Сбросить пароль
+          </a>
+          <p style="color:#999;font-size:13px">Если вы не запрашивали сброс — просто проигнорируйте это письмо.</p>
+        </div>
+      `,
+    });
+
+    res.json({ success: true, message: 'Если email зарегистрирован, письмо отправлено.' });
+  } catch (err) {
+    console.error('forgot-password:', err.message);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+// POST /api/auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token) return res.status(400).json({ error: 'Токен отсутствует' });
+  if (!password || password.length < 6) {
+    return res.status(400).json({ error: 'Пароль минимум 6 символов' });
+  }
+
+  try {
+    const result = await query(
+      'SELECT user_id FROM password_resets WHERE token = $1 AND expires_at > NOW()',
+      [token]
+    );
+
+    if (!result.rows.length) {
+      return res.status(400).json({ error: 'Ссылка недействительна или истекла' });
+    }
+
+    const userId = result.rows[0].user_id;
+    const passwordHash = await hashPassword(password);
+
+    await query('UPDATE users SET password_hash = $1 WHERE id = $2', [passwordHash, userId]);
+    await query('DELETE FROM password_resets WHERE user_id = $1', [userId]);
+    // Инвалидируем все сессии — заставляем перелогиниться
+    await query('DELETE FROM sessions WHERE user_id = $1', [userId]);
+
+    res.json({ success: true, message: 'Пароль успешно изменён. Войдите с новым паролем.' });
+  } catch (err) {
+    console.error('reset-password:', err.message);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 module.exports = router;

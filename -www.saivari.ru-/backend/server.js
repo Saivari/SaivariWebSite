@@ -11,6 +11,7 @@ const chatRouter = require('./routes/chat');
 const helmet = require('helmet');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 const authLimiter = rateLimit({
@@ -29,6 +30,14 @@ const loginLimiter = rateLimit({
   message: { error: 'Слишком много попыток входа. Попробуйте через 15 минут.' },
 });
 
+const resetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Слишком много запросов сброса пароля. Попробуйте через 15 минут.' },
+});
+
 app.use(helmet());
 
 app.use(cors({
@@ -40,6 +49,7 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.use('/api/auth/register', authLimiter);
 app.use('/api/auth/login', loginLimiter);
+app.use('/api/auth/forgot-password', resetLimiter);
 app.use('/api/auth', authRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/reviews', reviewsRouter);

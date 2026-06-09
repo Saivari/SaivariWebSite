@@ -82,6 +82,16 @@ async function initDB() {
       )
     `);
 
+    await client.query(`
+  CREATE TABLE IF NOT EXISTS password_resets (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token TEXT NOT NULL UNIQUE,
+    expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '1 hour',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )
+`);
+
     await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id)`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token)`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id)`);
@@ -91,6 +101,7 @@ async function initDB() {
     await client.query(`CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON reviews(created_at DESC)`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_chat_messages_order_id ON chat_messages(order_id)`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_chat_messages_created_at ON chat_messages(created_at ASC)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token)`);
 
     console.log('Таблицы и индексы инициализированы');
   } catch (err) {

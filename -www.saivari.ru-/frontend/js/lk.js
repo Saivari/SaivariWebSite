@@ -701,3 +701,26 @@ if (document.readyState === 'loading') {
 } else {
   initApp();
 }
+
+//сброс пароля
+
+async function forgotPassword() {
+  const email = document.getElementById('login-email')?.value?.trim();
+
+  if (!email) {
+    alert('Введите email в поле выше, затем нажмите «Забыли пароль?»');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    alert(data.message || data.error);
+  } catch {
+    alert('Ошибка сети. Попробуйте позже.');
+  }
+}
