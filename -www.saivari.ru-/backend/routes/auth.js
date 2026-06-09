@@ -3,6 +3,62 @@ const router = express.Router();
 const { query } = require('../database');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.resend.com',
+  port: 2465,
+  secure: true,
+  auth: { user: 'resend', pass: process.env.EMAIL_PASS },
+});
+
+function getBaseUrl() {
+  return process.env.APP_URL || 'https://saivari.ru';
+}
+
+async function sendVerificationEmail(email, token, name = '') {
+  const verifyLink = `${getBaseUrl()}/verify-email.html?token=${token}`;
+
+  await transporter.sendMail({
+    from: `"СайВари" <${process.env.EMAIL_FROM}>`,
+    to: email,
+    subject: 'Подтвердите email — СайВари',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:520px;padding:24px;border:1px solid #eee;border-radius:8px">
+        <h2 style="color:#8b1a1a">Подтверждение email</h2>
+        <p>${name ? `${name}, ` : ''}спасибо за регистрацию на сайте saivari.ru.</p>
+        <p>Чтобы активировать аккаунт, подтвердите ваш email. Ссылка действует <b>24 часа</b>.</p>
+        <a href="${verifyLink}"
+           style="display:inline-block;margin:16px 0;padding:12px 24px;background:#8b1a1a;color:#fff;border-radius:6px;text-decoration:none;font-weight:bold">
+          Подтвердить email
+        </a>
+        <p style="color:#999;font-size:13px">Если вы не регистрировались на сайте, просто проигнорируйте это письмо.</p>
+      </div>
+    `,
+  });
+}
+
+async function sendResetPasswordEmail(email, token) {
+  const resetLink = `${getBaseUrl()}/reset-password.html?token=${token}`;
+
+  await transporter.sendMail({
+    from: `"СайВари" <${process.env.EMAIL_FROM}>`,
+    to: email,
+    subject: 'Сброс пароля — СайВари',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:520px;padding:24px;border:1px solid #eee;border-radius:8px">
+        <h2 style="color:#8b1a1a">Сброс пароля</h2>
+        <p>Вы запросили сброс пароля на сайте saivari.ru.</p>
+        <p>Нажмите кнопку ниже — ссылка действует <b>1 час</b>:</p>
+        <a href="${resetLink}"
+           style="display:inline-block;margin:16px 0;padding:12px 24px;background:#8b1a1a;color:#fff;border-radius:6px;text-decoration:none;font-weight:bold">
+          Сбросить пароль
+        </a>
+        <p style="color:#999;font-size:13px">Если вы не запрашивали сброс — просто проигнорируйте это письмо.</p>
+      </div>
+    `,
+  });
+}
 
 const BCRYPT_ROUNDS = 12;
 
@@ -57,33 +113,60 @@ router.post('/register', async (req, res) => {
 
   try {
     const existing = await query(
-      'SELECT id FROM users WHERE email = $1',
+      'SELECT id, email_verified FROM users WHERE email = $1',
       [emailValue]
     );
 
     if (existing.rows.length > 0) {
-      return res.status(409).json({ error: 'Пользователь с таким email уже существует' });
+      if (existing.rows[0].email_verified) {
+        return res.status(409).json({ error: 'Пользователь с таким email уже существует' });
+      }
+
+      return res.status(409).json({
+        error: 'Этот email уже зарегистрирован, но ещё не подтверждён. Запросите повторную отправку письма.'
+      });
     }
 
     const passwordHash = await hashPassword(password);
+    const emailVerificationToken = generateToken();
+    const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const result = await query(
-      'INSERT INTO users (name, email, password_hash, phone) VALUES ($1, $2, $3, $4) RETURNING id, name, email, phone, role',
-      [nameValue, emailValue, passwordHash, phoneValue || null]
+      `INSERT INTO users (
+        name, email, password_hash, phone,
+        email_verified, email_verification_token, email_verification_expires
+      )
+       VALUES ($1, $2, $3, $4, false, $5, $6)
+       RETURNING id, name, email, phone, role, email_verified`,
+      [
+        nameValue,
+        emailValue,
+        passwordHash,
+        phoneValue || null,
+        emailVerificationToken,
+        emailVerificationExpires
+      ]
     );
 
     const user = result.rows[0];
-    const token = generateToken();
 
-    await query(
-      'INSERT INTO sessions (user_id, token, expires_at) VALUES ($1, $2, NOW() + INTERVAL \'30 days\')',
-      [user.id, token]
-    );
+    await sendVerificationEmail(user.email, emailVerificationToken, user.name);
 
-    res.status(201).json({ success: true, token, user });
+    return res.status(201).json({
+      success: true,
+      message: 'Регистрация почти завершена. Проверьте email и подтвердите адрес.',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        email_verified: user.email_verified
+      }
+    });
   } catch (err) {
     console.error('register:', err.message);
-    res.status(500).json({ error: 'Ошибка сервера' });
+    return res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
 
@@ -112,6 +195,12 @@ router.post('/login', async (req, res) => {
 
     if (!valid) {
       return res.status(401).json({ error: 'Неверный email или пароль' });
+    }
+
+    if (!user.email_verified) {
+      return res.status(403).json({
+        error: 'Подтвердите email, чтобы войти в аккаунт.'
+      });
     }
 
     const token = generateToken();
@@ -143,7 +232,7 @@ router.post('/logout', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (token) {
-    await query('DELETE FROM sessions WHERE token = $1', [token]).catch(() => {});
+    await query('DELETE FROM sessions WHERE token = $1', [token]).catch(() => { });
   }
 
   res.json({ success: true });
@@ -244,11 +333,17 @@ router.post('/forgot-password', async (req, res) => {
   }
 
   try {
-    const result = await query('SELECT id FROM users WHERE email = $1', [email]);
+    const result = await query(
+      'SELECT id FROM users WHERE email = $1 AND email_verified = true',
+      [email]
+    );
 
     // Всегда отвечаем одинаково — чтобы нельзя было проверить существование email
     if (!result.rows.length) {
-      return res.json({ success: true, message: 'Если email зарегистрирован, письмо отправлено.' });
+      return res.json({
+        success: true,
+        message: 'Если email зарегистрирован, письмо отправлено.'
+      });
     }
 
     const userId = result.rows[0].id;
@@ -263,41 +358,18 @@ router.post('/forgot-password', async (req, res) => {
       [userId, token]
     );
 
-    const resetLink = `https://saivari.ru/reset-password.html?token=${token}`;
+    await sendResetPasswordEmail(email, token);
 
-    // Отправляем письмо через Resend SMTP
-    const nodemailer = require('nodemailer');
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.resend.com',
-      port: 2465,
-      secure: true,
-      auth: { user: 'resend', pass: process.env.EMAIL_PASS },
+    return res.json({
+      success: true,
+      message: 'Если email зарегистрирован, письмо отправлено.'
     });
-
-    await transporter.sendMail({
-      from: `"СайВари" <${process.env.EMAIL_FROM}>`,
-      to: email,
-      subject: 'Сброс пароля — СайВари',
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:520px;padding:24px;border:1px solid #eee;border-radius:8px">
-          <h2 style="color:#01696f">Сброс пароля</h2>
-          <p>Вы запросили сброс пароля на сайте saivari.ru.</p>
-          <p>Нажмите кнопку ниже — ссылка действует <b>1 час</b>:</p>
-          <a href="${resetLink}"
-             style="display:inline-block;margin:16px 0;padding:12px 24px;background:#01696f;color:#fff;border-radius:6px;text-decoration:none;font-weight:bold">
-            Сбросить пароль
-          </a>
-          <p style="color:#999;font-size:13px">Если вы не запрашивали сброс — просто проигнорируйте это письмо.</p>
-        </div>
-      `,
-    });
-
-    res.json({ success: true, message: 'Если email зарегистрирован, письмо отправлено.' });
   } catch (err) {
     console.error('forgot-password:', err.message);
-    res.status(500).json({ error: 'Ошибка сервера' });
+    return res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
+
 
 // POST /api/auth/reset-password
 router.post('/reset-password', async (req, res) => {
@@ -330,6 +402,106 @@ router.post('/reset-password', async (req, res) => {
   } catch (err) {
     console.error('reset-password:', err.message);
     res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+// GET /api/auth/verify-email
+router.get('/verify-email', async (req, res) => {
+  const token = String(req.query.token || '').trim();
+
+  if (!token) {
+    return res.status(400).json({ error: 'Токен подтверждения отсутствует' });
+  }
+
+  try {
+    const result = await query(
+      `SELECT id, email, email_verified
+       FROM users
+       WHERE email_verification_token = $1
+         AND email_verification_expires > NOW()
+       LIMIT 1`,
+      [token]
+    );
+
+    if (!result.rows.length) {
+      return res.status(400).json({ error: 'Ссылка подтверждения недействительна или истекла' });
+    }
+
+    const user = result.rows[0];
+
+    await query(
+      `UPDATE users
+       SET email_verified = true,
+           email_verified_at = NOW(),
+           email_verification_token = NULL,
+           email_verification_expires = NULL
+       WHERE id = $1`,
+      [user.id]
+    );
+
+    return res.json({
+      success: true,
+      message: 'Email успешно подтверждён. Теперь вы можете войти в аккаунт.'
+    });
+  } catch (err) {
+    console.error('verify-email:', err.message);
+    return res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+// POST /api/auth/resend-verification
+router.post('/resend-verification', async (req, res) => {
+  const email = String(req.body.email || '').trim().toLowerCase();
+
+  if (!validateEmail(email)) {
+    return res.status(400).json({ error: 'Введите корректный email' });
+  }
+
+  try {
+    const result = await query(
+      `SELECT id, name, email, email_verified
+       FROM users
+       WHERE email = $1
+       LIMIT 1`,
+      [email]
+    );
+
+    if (!result.rows.length) {
+      return res.json({
+        success: true,
+        message: 'Если аккаунт существует, письмо с подтверждением отправлено.'
+      });
+    }
+
+    const user = result.rows[0];
+
+    if (user.email_verified) {
+      return res.json({
+        success: true,
+        message: 'Email уже подтверждён. Вы можете войти в аккаунт.'
+      });
+    }
+
+    const emailVerificationToken = generateToken();
+    const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await query(
+      `UPDATE users
+       SET email_verification_token = $1,
+           email_verification_expires = $2
+       WHERE id = $3`,
+      [emailVerificationToken, emailVerificationExpires, user.id]
+    );
+
+    await sendVerificationEmail(user.email, emailVerificationToken, user.name);
+
+    return res.json({
+      success: true,
+      message: 'Если аккаунт существует, письмо с подтверждением отправлено.'
+    });
+  } catch (err) {
+    console.error('resend-verification:', err.message);
+    return res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
 
