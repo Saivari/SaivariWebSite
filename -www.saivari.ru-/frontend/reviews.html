@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Отзывы клиентов СайВари — ремонт электроники и сетей в Липецке." />
+  <title>Отзывы — СайВари</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+  <!-- ===================== ШАПКА ===================== -->
+  <header class="header" role="banner">
+    <div class="container--wide">
+      <div class="header__inner">
+
+        <a href="/" class="logo" aria-label="СайВари — перейти на главную">
+          <img src="./assets/images/logo.png" alt="Логотип СайВари" width="42" height="42" loading="eager">
+          Сай<span>Вари</span>
+        </a>
+
+        <nav class="nav" role="navigation" aria-label="Основная навигация">
+          <ul class="nav__links" role="list">
+            <li><a href="/#services">Услуги</a></li>
+            <li><a href="/#how">Как работаю</a></li>
+            <li><a href="/reviews.html" class="active">Отзывы</a></li>
+            <li><a href="/#contact">Контакты</a></li>
+          </ul>
+          <a href="/login.html" class="btn btn--outline" style="margin-right:var(--space-2)">Личный кабинет</a>
+          <a href="/#contact" class="btn btn--primary">Оставить заявку</a>
+          <button class="theme-toggle" data-theme-toggle aria-label="Переключить тему"></button>
+        </nav>
+
+        <button class="hamburger" id="hamburger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
+          <span></span><span></span><span></span>
+        </button>
+
+      </div>
+    </div>
+
+    <nav class="mobile-menu" id="mobile-menu" role="navigation" aria-label="Мобильное меню">
+      <a href="/#services">Услуги</a>
+      <a href="/#how">Как работаю</a>
+      <a href="/reviews.html">Отзывы</a>
+      <a href="/#contact">Контакты</a>
+      <a href="/login.html" style="margin-top:var(--space-2)">Личный кабинет</a>
+      <a href="/#contact" class="btn btn--primary" style="margin-top:var(--space-2);justify-content:center;">Оставить заявку</a>
+    </nav>
+  </header>
+
+
+  <main id="main-content">
+    <section class="section" aria-labelledby="reviews-page-title">
+      <div class="container">
+
+        <!-- Заголовок -->
+        <div class="section-header">
+          <p class="eyebrow">Мнения клиентов</p>
+          <h1 class="section-title" id="reviews-page-title">Все отзывы</h1>
+          <p class="section-sub">Реальные отзывы от людей, которым я помог.</p>
+        </div>
+
+        <!-- Фильтр по рейтингу -->
+        <div class="reviews-filter" id="reviews-filter" role="group" aria-label="Фильтр по оценке">
+          <button class="filter-btn active" data-rating="0">Все</button>
+          <button class="filter-btn" data-rating="5">★★★★★</button>
+          <button class="filter-btn" data-rating="4">★★★★☆</button>
+          <button class="filter-btn" data-rating="3">★★★☆☆</button>
+          <button class="filter-btn" data-rating="2">★★☆☆☆</button>
+          <button class="filter-btn" data-rating="1">★☆☆☆☆</button>
+        </div>
+
+        <!-- Список отзывов -->
+        <div class="reviews-grid" id="reviews-list" aria-live="polite" aria-label="Список отзывов">
+          <!-- Карточки рендерятся через reviews.js -->
+          <div class="reviews-skeleton">
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+          </div>
+        </div>
+
+        <!-- Пагинация -->
+        <nav class="pagination" id="pagination" aria-label="Страницы отзывов"></nav>
+
+        <!-- Форма добавления отзыва -->
+        <div class="review-form-wrap" style="margin-top: var(--space-16)">
+          <h2 class="review-form__title">Оставить отзыв</h2>
+          <form class="review-form" id="review-form" novalidate>
+
+            <div class="review-form__row">
+              <div class="form-group">
+                <label class="form-label" for="review-name">Ваше имя</label>
+                <input class="form-input" id="review-name" name="review-name" type="text" placeholder="Иван" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="review-rating">Оценка</label>
+                <div class="star-rating" id="star-rating" role="radiogroup" aria-label="Выберите оценку">
+                  <span class="star" data-value="1" role="radio" aria-checked="false" tabindex="0" aria-label="1 звезда">★</span>
+                  <span class="star" data-value="2" role="radio" aria-checked="false" tabindex="0" aria-label="2 звезды">★</span>
+                  <span class="star" data-value="3" role="radio" aria-checked="false" tabindex="0" aria-label="3 звезды">★</span>
+                  <span class="star" data-value="4" role="radio" aria-checked="false" tabindex="0" aria-label="4 звезды">★</span>
+                  <span class="star" data-value="5" role="radio" aria-checked="false" tabindex="0" aria-label="5 звёзд">★</span>
+                </div>
+                <input type="hidden" id="review-rating" name="review-rating" value="0">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="review-text">Ваш отзыв</label>
+              <textarea class="form-textarea" id="review-text" name="review-text" placeholder="Расскажите о своём опыте..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn--primary">Отправить отзыв</button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+
+  <!-- ===================== ФУТЕР ===================== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <span class="footer__logo">Сай<span>Вари</span></span>
+          <p class="footer__desc">Ремонт электроники и компьютерных сетей в Липецке. Выезд на дом.</p>
+        </div>
+        <nav class="footer__nav" aria-label="Навигация в подвале">
+          <div class="footer__nav-col">
+            <div class="footer__nav-title">Социальные сети</div>
+            <div style="display:flex; flex-wrap:wrap; gap:var(--space-4) var(--space-6)">
+              <a href="https://vk.com/" target="_blank" rel="noopener noreferrer">ВКонтакте</a>
+              <a href="mailto:info@saivari.ru">Gmail</a>
+              <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer">YouTube</a>
+              <a href="https://max.ru/" target="_blank" rel="noopener noreferrer">Max</a>
+            </div>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__bottom">
+        <span class="footer__copy">© 2026 СайВари. Все права защищены.</span>
+        <span class="footer__addr">г. Липецк, ул. Индустриальная, 22</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="./js/reviews.js"></script>
+</body>
+
+</html>
