@@ -160,25 +160,27 @@ router.patch('/:id', async (req, res) => {
 });
 
 async function sendEmailNotification(id, name, contact, service, message) {
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) return;
+  if (!process.env.EMAIL_PASS || !process.env.EMAIL_FROM) return;
 
-  const safeName = escapeHtml(name);
+  const safeName    = escapeHtml(name);
   const safeContact = escapeHtml(contact);
   const safeService = escapeHtml(service || '—');
   const safeMessage = escapeHtml(message || '—');
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.resend.com',
+    port: 465,
+    secure: true,
     auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS,
+      user: 'resend',
+      pass: process.env.EMAIL_PASS,
     },
   });
 
   await transporter.sendMail({
-    from: `"СайВари сайт" <${process.env.GMAIL_USER}>`,
-    to: 'saivari.electronics@gmail.com',
-    replyTo: contact.includes('@') ? contact : process.env.GMAIL_USER,
+    from: `"СайВари сайт" <${process.env.EMAIL_FROM}>`,
+    to: process.env.EMAIL_TO || process.env.EMAIL_FROM,
+    replyTo: contact.includes('@') ? contact : process.env.EMAIL_FROM,
     subject: `Заявка #${id} от ${name}`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:560px;padding:20px;border:1px solid #eee;border-radius:8px">
