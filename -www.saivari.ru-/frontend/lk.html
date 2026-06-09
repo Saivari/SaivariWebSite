@@ -54,6 +54,8 @@
   <div class="auth-overlay" id="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title"
     style="display:none">
     <div class="auth-modal">
+      <button type="button" class="auth-close" onclick="closeAuthModal()" aria-label="Закрыть">✕</button>
+
       <h2 class="auth-modal-title" id="auth-title">Войдите в аккаунт</h2>
       <div class="auth-tabs" role="tablist">
         <button class="auth-tab active" id="tab-login" role="tab" aria-selected="true"
@@ -80,6 +82,10 @@
         </p>
         <p class="auth-hint">Нет аккаунта? <a onclick="switchTab('register')">Зарегистрируйтесь</a></p>
       </form>
+
+      <p class="auth-hint">
+        <a href="/" onclick="closeAuthModal(); return false;">Вернуться на главную</a>
+      </p>
 
       <!-- Форма регистрации -->
       <form class="auth-form" id="register-form" novalidate style="display:none">

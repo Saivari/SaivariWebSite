@@ -724,3 +724,9 @@ async function forgotPassword() {
     alert('Ошибка сети. Попробуйте позже.');
   }
 }
+
+function closeAuthModal() {
+  const overlay = el('auth-overlay');
+  if (overlay) overlay.style.display = 'none';
+  window.location.href = '/';
+}
