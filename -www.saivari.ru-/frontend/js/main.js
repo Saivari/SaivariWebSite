@@ -152,12 +152,10 @@ function initPhoneMask(input) {
 
   initPhoneMask(contactInput);
 
-  // Валидация имени: только буквы (кириллица/латиница), пробелы, дефис, минимум 2 символа
   function validateName(val) {
     return /^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(val.trim());
   }
 
-  // Валидация контакта: телефон (+7/8 + 10 цифр) или email
   function validateContact(val) {
     const phone = /^(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(val.trim());
     const email = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val.trim());
@@ -182,7 +180,6 @@ function initPhoneMask(input) {
     if (err) err.remove();
   }
 
-  // Очищаем ошибки при вводе
   nameInput.addEventListener('input', () => clearError(nameInput));
   contactInput.addEventListener('input', () => clearError(contactInput));
 
@@ -249,53 +246,99 @@ function initPhoneMask(input) {
 
 /* ============================================================
    5. ОТЗЫВЫ — звёздный рейтинг + добавление карточки
+   На главной странице показываем только 3 последних отзыва.
+   Остальные отзывы доступны на странице /reviews.html
    ============================================================ */
 
-(function initReviews() {
-  const form       = document.getElementById('review-form');
-  const ratingInput = document.getElementById('review-rating');
-  const stars      = document.querySelectorAll('#star-rating .star');
-  const list       = document.getElementById('reviews-list');
+/* Количество отзывов на главной странице */
+const REVIEWS_PREVIEW_COUNT = 3;
 
-  if (!form || !stars.length || !list) return;
-  
-// Загрузить одобренные отзывы с сервера
+(function initReviews() {
+  const form        = document.getElementById('review-form');
+  const ratingInput = document.getElementById('review-rating');
+  const stars       = document.querySelectorAll('#star-rating .star');
+  const list        = document.getElementById('reviews-list');
+
+  if (!list) return;
+
+  // --- Загрузка отзывов с сервера (только 3 последних на главной) ---
   fetch('/api/reviews')
     .then(r => r.json())
     .then(data => {
       if (!data.reviews || !data.reviews.length) return;
-      // Очищаем захардкоженные отзывы и подгружаем из БД
+
+      // Берём только первые REVIEWS_PREVIEW_COUNT отзывов
+      const preview = data.reviews.slice(0, REVIEWS_PREVIEW_COUNT);
+
       list.innerHTML = '';
-      data.reviews.forEach(review => {
-        const starsHtml = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-        const date = new Date(review.created_at).toLocaleDateString('ru-RU', {
-          day: 'numeric', month: 'long', year: 'numeric'
-        });
-        const initial = review.author.charAt(0).toUpperCase();
-        const card = document.createElement('article');
-        card.className = 'review-card';
-        card.innerHTML = `
-          <div class="review-card__header">
-            <div class="review-avatar">${initial}</div>
-            <div>
-              <div class="review-author">${escapeHtml(review.author)}</div>
-              <div class="review-date">${date}</div>
-            </div>
-            <div class="review-stars">${starsHtml}</div>
-          </div>
-          <p class="review-text">${escapeHtml(review.body)}</p>
-        `;
-        list.appendChild(card);
+      preview.forEach(review => {
+        list.appendChild(buildReviewCard(review));
       });
+
+      // Добавляем кнопку «Все отзывы» если их больше чем REVIEWS_PREVIEW_COUNT
+      if (data.reviews.length > REVIEWS_PREVIEW_COUNT) {
+        appendShowAllButton(list, data.reviews.length);
+      }
     })
-    .catch(() => {}); // если сервер не отвечает — остаются статичные отзывы
-  // Выбор звёзд
+    .catch(() => {
+      // Если сервер не отвечает — остаются статичные отзывы из HTML.
+      // Всё равно показываем кнопку «Все отзывы»
+      appendShowAllButton(list, null);
+    });
+
+  // --- Построить карточку отзыва ---
+  function buildReviewCard(review) {
+    const starsHtml = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+    const date = new Date(review.created_at).toLocaleDateString('ru-RU', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+    const initial = review.author.charAt(0).toUpperCase();
+    const card = document.createElement('article');
+    card.className = 'review-card';
+    card.innerHTML = `
+      <div class="review-card__header">
+        <div class="review-avatar">${initial}</div>
+        <div>
+          <div class="review-author">${escapeHtml(review.author)}</div>
+          <div class="review-date">${date}</div>
+        </div>
+        <div class="review-stars">${starsHtml}</div>
+      </div>
+      <p class="review-text">${escapeHtml(review.body)}</p>
+    `;
+    return card;
+  }
+
+  // --- Кнопка «Все отзывы» ---
+  function appendShowAllButton(container, total) {
+    // Не добавлять повторно
+    if (document.getElementById('reviews-show-all')) return;
+
+    const wrap = document.createElement('div');
+    wrap.id = 'reviews-show-all';
+    wrap.style.cssText = 'text-align:center; margin-top: 2rem;';
+
+    const label = total ? `Все отзывы (${total})` : 'Все отзывы →';
+
+    wrap.innerHTML = `
+      <a href="/reviews.html" class="btn btn--outline" style="display:inline-flex;align-items:center;gap:0.4em;">
+        ${label}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    `;
+    container.parentElement.insertBefore(wrap, container.nextSibling);
+  }
+
+  // --- Звёздный рейтинг ---
+  if (!form || !stars.length || !ratingInput) return;
+
   let selectedRating = 0;
 
   stars.forEach(star => {
     star.addEventListener('mouseenter', () => {
-      const val = parseInt(star.dataset.value);
-      highlightStars(val);
+      highlightStars(parseInt(star.dataset.value));
     });
 
     star.addEventListener('mouseleave', () => {
@@ -311,7 +354,6 @@ function initPhoneMask(input) {
       ));
     });
 
-    // Клавиатурное управление
     star.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -326,7 +368,7 @@ function initPhoneMask(input) {
     });
   }
 
- // Отправка отзыва
+  // --- Отправка отзыва ---
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -334,7 +376,7 @@ function initPhoneMask(input) {
     const text   = form.querySelector('#review-text').value.trim();
     const rating = parseInt(ratingInput.value);
 
-     if (!name) {
+    if (!name) {
       setFieldError(form.querySelector('#review-name'), 'Введите ваше имя.');
       return;
     } else if (!/^[а-яёА-ЯЁa-zA-Z][а-яёА-ЯЁa-zA-Z\s\-]{1,49}$/.test(name)) {
@@ -365,24 +407,21 @@ function initPhoneMask(input) {
       const data = await response.json();
 
       if (response.ok) {
-        // Показываем карточку локально — отзыв ждёт модерации
-        const starsHtml = '★'.repeat(rating) + '☆'.repeat(5 - rating);
         const today = new Date().toLocaleDateString('ru-RU', {
           day: 'numeric', month: 'long', year: 'numeric'
         });
-        const initial = name.charAt(0).toUpperCase();
 
         const card = document.createElement('article');
         card.className = 'review-card';
         card.style.cssText = 'opacity:0;transform:translateY(12px);transition:opacity 0.4s ease,transform 0.4s ease;';
         card.innerHTML = `
           <div class="review-card__header">
-            <div class="review-avatar">${initial}</div>
+            <div class="review-avatar">${name.charAt(0).toUpperCase()}</div>
             <div>
               <div class="review-author">${escapeHtml(name)}</div>
               <div class="review-date">${today} · на модерации</div>
             </div>
-            <div class="review-stars">${starsHtml}</div>
+            <div class="review-stars">${'★'.repeat(rating) + '☆'.repeat(5 - rating)}</div>
           </div>
           <p class="review-text">${escapeHtml(text)}</p>
         `;
@@ -393,7 +432,6 @@ function initPhoneMask(input) {
           card.style.transform = 'translateY(0)';
         });
 
-        // Сброс формы
         form.reset();
         selectedRating = 0;
         ratingInput.value = 0;
