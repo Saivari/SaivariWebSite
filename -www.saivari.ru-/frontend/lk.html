@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Личный кабинет — Saivari</title>
+  <title>Личный кабинет — Сайвари</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -17,24 +17,12 @@
 
 <body>
 
-  <!-- Шапка сайта -->
-  <div class="topbar">
-    <div class="container--wide topbar__inner">
-      <span class="topbar__text">Компьютерный мастер в Воронеже · Выезд на дом и в офис</span>
-      <div class="topbar__socials">
-        <a href="https://vk.com" target="_blank" rel="noopener noreferrer" class="social-link"
-          aria-label="ВКонтакте">ВКонтакте</a>
-        <a href="mailto:info@saivari.ru" class="social-link" aria-label="Gmail">info@saivari.ru</a>
-      </div>
-    </div>
-  </div>
-
   <header class="header" role="banner">
     <div class="container--wide">
       <div class="header__inner">
         <a href="/" class="logo" aria-label="Saivari — на главную">
           <img src="./assets/images/logo.png" alt="" width="42" height="42" loading="eager">
-          <span>Sai<span>vari</span></span>
+          <span>Сай<span>вари</span></span>
         </a>
         <nav class="nav" role="navigation" aria-label="Главная навигация">
           <ul class="nav__links" role="list">
@@ -300,6 +288,34 @@
       </form>
     </div>
   </div>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <span class="footer__logo">Сай<span>вари</span></span>
+          <p class="footer__desc">Ремонт электроники и компьютерных сетей в Липецке. Выезд на дом.</p>
+        </div>
+        <nav class="footer__nav" aria-label="Навигация в подвале">
+          <div class="footer__nav-col">
+            <div class="footer__nav-title">Социальные сети</div>
+            <div style="display:flex; flex-wrap:wrap; gap:var(--space-4) var(--space-6)">
+              <a href="https://vk.com/" target="_blank" rel="noopener noreferrer">ВКонтакте</a>
+              <a href="saivari.electronics@gmail.com">Gmail</a>
+              <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer">YouTube</a>
+              <a href="https://max.ru/" target="_blank" rel="noopener noreferrer">Max</a>
+              <a href="https://web.telegram.org/k/" target="_blank" rel="noopener noreferrer">Telegram</a>
+            </div>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__bottom">
+        <span class="footer__copy">© 2026 Сайвари. Все права защищены.</span>
+        <span class="footer__addr">г. Липецк, ул. Танкистов, 1А</span>
+      </div>
+    </div>
+  </footer>
 
   <script src="./js/main.js?v=2"></script>
   <script src="./js/lk.js?v=3"></script>
